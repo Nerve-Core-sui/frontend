@@ -3,11 +3,20 @@
 import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
 import { AuthSession, ZkLoginState } from '@/types/zklogin';
 
+interface User {
+  address: string;
+  balance: number;
+  avatar?: string;
+}
+
 interface AuthContextType extends ZkLoginState {
   session: AuthSession | null;
+  user: User | null;
   setSession: (session: AuthSession | null) => void;
   clearSession: () => void;
   restoreSession: () => void;
+  login: (address: string) => void;
+  logout: () => void;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -86,6 +95,28 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   }, []);
 
+  // Mock login function for development
+  const login = useCallback((address: string) => {
+    const mockSession: AuthSession = {
+      address,
+      jwt: 'mock-jwt-token',
+      ephemeralKeyPair: {
+        privateKey: 'mock-private-key',
+        publicKey: 'mock-public-key',
+      },
+      zkProof: null,
+      maxEpoch: 0,
+      randomness: 'mock-randomness',
+      isAuthenticated: true,
+    };
+    setSession(mockSession);
+  }, [setSession]);
+
+  // Logout alias for clearSession
+  const logout = useCallback(() => {
+    clearSession();
+  }, [clearSession]);
+
   // Auto-restore session on mount
   useEffect(() => {
     restoreSession();
@@ -97,9 +128,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     isAuthenticated: session?.isAuthenticated || false,
     isLoading,
     error,
+    user: session ? { address: session.address, balance: 0, avatar: undefined } : null,
     setSession,
     clearSession,
     restoreSession,
+    login,
+    logout,
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

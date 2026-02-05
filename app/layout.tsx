@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import "./globals.css";
 import { Layout } from "@/components/layout/Layout";
 import { AuthProvider } from "@/contexts/AuthContext";
+import { BattleProvider } from "@/contexts/BattleContext";
 
 export const metadata: Metadata = {
   title: "NerveCore - Conquer DeFi",
@@ -19,9 +20,11 @@ export default function RootLayout({
     <html lang="en" className="dark">
       <body className="antialiased">
         <AuthProvider>
-          <Layout>
-            {children}
-          </Layout>
+          <BattleProvider>
+            <Layout>
+              {children}
+            </Layout>
+          </BattleProvider>
         </AuthProvider>
       </body>
     </html>
