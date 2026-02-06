@@ -3,12 +3,10 @@
  */
 
 import { useState, useEffect, useCallback } from 'react';
-import { SuiClient } from '@mysten/sui.js/client';
 import { useAuth } from '@/contexts/AuthContext';
+import { suiClient } from '@/lib/sui-client';
 import { InventoryData, InventoryItem, ItemRarity, TokenItem, PositionItem } from '@/types/inventory';
 import { formatTokenAmount } from '@/lib/contracts';
-
-const RPC_URL = process.env.NEXT_PUBLIC_SUI_RPC_URL || 'https://fullnode.testnet.sui.io:443';
 
 // Determine rarity based on USD value
 function getRarityByValue(usdValue: number): ItemRarity {
@@ -51,12 +49,11 @@ export function useInventory() {
     try {
       setData(prev => ({ ...prev, isLoading: true, error: null }));
 
-      const client = new SuiClient({ url: RPC_URL });
       const items: InventoryItem[] = [];
       let totalValue = 0;
 
       // Fetch all objects owned by user
-      const ownedObjects = await client.getOwnedObjects({
+      const ownedObjects = await suiClient.getOwnedObjects({
         owner: user.address,
         options: {
           showType: true,

@@ -3,7 +3,7 @@
  * Update these after deployment
  */
 
-import { TransactionBlock } from '@mysten/sui.js/transactions';
+import { Transaction } from '@mysten/sui/transactions';
 
 // Contract addresses from deployment
 export const PACKAGE_ID = process.env.NEXT_PUBLIC_PACKAGE_ID || '';
@@ -65,8 +65,8 @@ export function parseTokenAmount(amount: string | number, decimals = TOKEN_DECIM
 /**
  * Create transaction to claim MSUI from faucet
  */
-export function createFaucetMSUITransaction(): TransactionBlock {
-  const tx = new TransactionBlock();
+export function createFaucetMSUITransaction(): Transaction {
+  const tx = new Transaction();
 
   tx.moveCall({
     target: `${PACKAGE_ID}::faucet::faucet_msui`,
@@ -83,8 +83,8 @@ export function createFaucetMSUITransaction(): TransactionBlock {
 /**
  * Create transaction to claim MUSDC from faucet
  */
-export function createFaucetMUSDCTransaction(): TransactionBlock {
-  const tx = new TransactionBlock();
+export function createFaucetMUSDCTransaction(): Transaction {
+  const tx = new Transaction();
 
   tx.moveCall({
     target: `${PACKAGE_ID}::faucet::faucet_musdc`,
@@ -101,8 +101,8 @@ export function createFaucetMUSDCTransaction(): TransactionBlock {
 /**
  * Create transaction to deposit MSUI into lending pool
  */
-export function createDepositTransaction(msuiCoinId: string): TransactionBlock {
-  const tx = new TransactionBlock();
+export function createDepositTransaction(msuiCoinId: string): Transaction {
+  const tx = new Transaction();
 
   tx.moveCall({
     target: `${PACKAGE_ID}::lending::deposit`,
@@ -122,8 +122,8 @@ export function createDepositTransaction(msuiCoinId: string): TransactionBlock {
 export function createBorrowTransaction(
   receiptId: string,
   amount: bigint
-): TransactionBlock {
-  const tx = new TransactionBlock();
+): Transaction {
+  const tx = new Transaction();
 
   tx.moveCall({
     target: `${PACKAGE_ID}::lending::borrow`,
@@ -143,8 +143,8 @@ export function createBorrowTransaction(
 export function createRepayTransaction(
   receiptId: string,
   musdcCoinId: string
-): TransactionBlock {
-  const tx = new TransactionBlock();
+): Transaction {
+  const tx = new Transaction();
 
   tx.moveCall({
     target: `${PACKAGE_ID}::lending::repay`,
@@ -161,8 +161,8 @@ export function createRepayTransaction(
 /**
  * Create transaction to withdraw MSUI from lending pool
  */
-export function createWithdrawTransaction(receiptId: string): TransactionBlock {
-  const tx = new TransactionBlock();
+export function createWithdrawTransaction(receiptId: string): Transaction {
+  const tx = new Transaction();
 
   tx.moveCall({
     target: `${PACKAGE_ID}::lending::withdraw`,
@@ -181,8 +181,8 @@ export function createWithdrawTransaction(receiptId: string): TransactionBlock {
 export function createSwapMSUIToMUSDCTransaction(
   msuiCoinId: string,
   minOut: bigint
-): TransactionBlock {
-  const tx = new TransactionBlock();
+): Transaction {
+  const tx = new Transaction();
 
   tx.moveCall({
     target: `${PACKAGE_ID}::swap::swap_msui_to_musdc_entry`,
@@ -202,8 +202,8 @@ export function createSwapMSUIToMUSDCTransaction(
 export function createSwapMUSDCToMSUITransaction(
   musdcCoinId: string,
   minOut: bigint
-): TransactionBlock {
-  const tx = new TransactionBlock();
+): Transaction {
+  const tx = new Transaction();
 
   tx.moveCall({
     target: `${PACKAGE_ID}::swap::swap_musdc_to_msui_entry`,
@@ -223,8 +223,8 @@ export function createSwapMUSDCToMSUITransaction(
 export function createAddLiquidityTransaction(
   msuiCoinId: string,
   musdcCoinId: string
-): TransactionBlock {
-  const tx = new TransactionBlock();
+): Transaction {
+  const tx = new Transaction();
 
   tx.moveCall({
     target: `${PACKAGE_ID}::swap::add_liquidity_entry`,
@@ -241,8 +241,8 @@ export function createAddLiquidityTransaction(
 /**
  * Create transaction to remove liquidity from swap pool
  */
-export function createRemoveLiquidityTransaction(lpReceiptId: string): TransactionBlock {
-  const tx = new TransactionBlock();
+export function createRemoveLiquidityTransaction(lpReceiptId: string): Transaction {
+  const tx = new Transaction();
 
   tx.moveCall({
     target: `${PACKAGE_ID}::swap::remove_liquidity_entry`,
@@ -266,8 +266,8 @@ export function createLeverageQuestTransaction(
   initialMsuiCoinId: string,
   borrowAmount: bigint,
   minSwapOut: bigint
-): TransactionBlock {
-  const tx = new TransactionBlock();
+): Transaction {
+  const tx = new Transaction();
 
   // Step 1: Deposit MSUI
   const [receipt] = tx.moveCall({

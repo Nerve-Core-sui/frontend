@@ -77,7 +77,7 @@ export function decodeJwt(jwt: string): JWTPayload {
  * Derive Sui address from JWT using real zkLogin address derivation
  */
 export function deriveZkLoginAddress(jwt: string, salt: string): string {
-  return jwtToAddress(jwt, BigInt(salt));
+  return jwtToAddress(jwt, BigInt(salt), false);
 }
 
 /**
