@@ -9,8 +9,7 @@
     "lint": "next lint"
   },
   "dependencies": {
-    "@mysten/sui.js": "^0.54.1",
-    "@mysten/zklogin": "^0.8.1",
+    "@mysten/sui": "^2.3.0",
     "@radix-ui/react-dialog": "^1.1.15",
     "@radix-ui/react-slot": "^1.2.4",
     "clsx": "^2.1.1",

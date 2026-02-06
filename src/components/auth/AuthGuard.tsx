@@ -4,6 +4,7 @@ import React from 'react';
 import { motion } from 'framer-motion';
 import { Loader2, LogIn } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
+import { useZkLogin } from '@/hooks/useZkLogin';
 import { Button } from '@/components/ui/Button';
 import { Card } from '@/components/ui/Card';
 
@@ -18,11 +19,11 @@ export function AuthGuard({
   fallback,
   loadingFallback,
 }: AuthGuardProps) {
-  const { isAuthenticated, isLoading, login } = useAuth();
+  const { isAuthenticated, isLoading } = useAuth();
+  const { login: zkLogin, isProcessing } = useZkLogin();
 
   const handleLogin = () => {
-    const mockAddress = '0x' + Math.random().toString(16).slice(2, 42);
-    login(mockAddress);
+    zkLogin();
   };
 
   if (isLoading) {
@@ -60,8 +61,8 @@ export function AuthGuard({
               <p className="text-sm text-text-secondary mb-6">
                 Connect your wallet to access this feature
               </p>
-              <Button variant="primary" size="lg" onClick={handleLogin}>
-                Connect Wallet
+              <Button variant="primary" size="lg" onClick={handleLogin} disabled={isProcessing}>
+                {isProcessing ? 'Connecting...' : 'Connect Wallet'}
               </Button>
               <p className="mt-4 text-xs text-text-muted">
                 Powered by zkLogin on Sui

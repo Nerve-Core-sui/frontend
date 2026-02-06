@@ -2,8 +2,8 @@
 
 import React from 'react';
 import { AnimatePresence } from 'framer-motion';
-import { TopBar } from './TopBar';
-import { BottomNav } from './BottomNav';
+import { AppHeader } from './AppHeader';
+import { AppBottomNav } from './AppBottomNav';
 import { TransactionOverlay } from '@/components/transaction/TransactionOverlay';
 import { SplashScreen } from '@/components/splash';
 import { useSplashScreen } from '@/hooks/useSplashScreen';
@@ -24,21 +24,28 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
         )}
       </AnimatePresence>
 
-      {/* Main App */}
-      <div className="min-h-screen bg-background text-text-primary">
-        {/* Top bar */}
-        <TopBar />
+      {/* Phone Stage — on desktop this creates the centered mockup background */}
+      <div className="phone-stage">
+        {/* Phone Device — constrained on desktop, full-screen on mobile */}
+        <div className="phone-device scanlines">
+          <div className="phone-inner">
+            {/* Fixed Header */}
+            <AppHeader />
 
-        {/* Main content */}
-        <main className="px-4 pb-24">
-          {children}
-        </main>
+            {/* Scrollable Content */}
+            <main className="phone-scroll hide-scrollbar pixel-grid-bg">
+              <div className="px-4 py-4 pb-4">
+                {children}
+              </div>
+            </main>
 
-        {/* Bottom navigation */}
-        <BottomNav />
+            {/* Fixed Bottom Nav */}
+            <AppBottomNav />
+          </div>
 
-        {/* Transaction progress overlay */}
-        <TransactionOverlay />
+          {/* Transaction Overlay (inside phone-device so it's contained on desktop) */}
+          <TransactionOverlay />
+        </div>
       </div>
     </>
   );

@@ -2,167 +2,231 @@
 
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/contexts/AuthContext';
+import { useZkLogin } from '@/hooks/useZkLogin';
 import { motion } from 'framer-motion';
-import { Card } from '@/components/ui/Card';
-import { Button } from '@/components/ui/Button';
+import { QUESTS } from '@/lib/quests';
+
+const stagger = {
+  hidden: {},
+  show: { transition: { staggerChildren: 0.08 } },
+};
+
+const fadeUp = {
+  hidden: { opacity: 0, y: 16 },
+  show: { opacity: 1, y: 0, transition: { duration: 0.35, ease: 'easeOut' as const } },
+};
 
 export default function HomePage() {
   const router = useRouter();
-  const { user, isAuthenticated, login } = useAuth();
+  const { user, isAuthenticated } = useAuth();
+  const { login: zkLogin, isProcessing } = useZkLogin();
 
-  const handleLogin = () => {
-    const mockAddress = '0x' + Math.random().toString(16).slice(2, 42);
-    login(mockAddress);
+  const handleConnect = () => {
+    zkLogin();
   };
 
   const quickActions = [
-    { icon: '⇅', label: 'Swap', color: 'text-pixel-gold', href: '/quests' },
-    { icon: '↓', label: 'Deposit', color: 'text-pixel-green', href: '/quests' },
-    { icon: '↗', label: 'Leverage', color: 'text-pixel-orange', href: '/quests' },
-    { icon: '💧', label: 'Faucet', color: 'text-pixel-blue', href: '/faucet' },
+    { icon: '⇄', label: 'Swap', color: '#eab308', bg: 'rgba(234,179,8,0.12)', href: '/quests' },
+    { icon: '↓', label: 'Deposit', color: '#84cc16', bg: 'rgba(132,204,22,0.12)', href: '/quests' },
+    { icon: '⚡', label: 'Boost', color: '#a855f7', bg: 'rgba(168,85,247,0.12)', href: '/quests' },
+    { icon: '💧', label: 'Faucet', color: '#6dc2f2', bg: 'rgba(109,194,242,0.12)', href: '/faucet' },
   ];
 
-  const recentActivity = [
-    { type: 'swap', icon: '⇅', description: 'Swapped 10 SUI for USDC', time: '2 min ago', color: 'text-pixel-gold' },
-    { type: 'deposit', icon: '↓', description: 'Deposited 50 SUI', time: '1 hour ago', color: 'text-pixel-green' },
-    { type: 'leverage', icon: '↗', description: 'Opened 2x position', time: '3 hours ago', color: 'text-pixel-orange' },
-  ];
+  // Pick first 3 quests for featured section
+  const featured = QUESTS.slice(0, 3);
+
+  const difficultyColor: Record<string, string> = {
+    beginner: 'text-pixel-lime bg-pixel-lime/10 border-pixel-lime',
+    intermediate: 'text-pixel-gold bg-pixel-gold/10 border-pixel-gold',
+    advanced: 'text-pixel-red bg-pixel-red/10 border-pixel-red',
+  };
 
   return (
-    <div className="py-4 space-y-6 px-4">
-      {/* Balance Card */}
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.3 }}
-      >
-        <Card className="p-6 bg-gradient-to-br from-surface to-surface-elevated">
-          <p className="font-pixel text-xs text-pixel-gold mb-2 uppercase">Total Balance</p>
+    <motion.div
+      className="space-y-5"
+      variants={stagger}
+      initial="hidden"
+      animate="show"
+    >
+      {/* ── Balance Card ── */}
+      <motion.div variants={fadeUp}>
+        <div
+          className="relative overflow-hidden p-5"
+          style={{
+            background: 'linear-gradient(135deg, #2d2438 0%, #3d3450 60%, #2d2438 100%)',
+            border: '3px solid #4a3f5c',
+            boxShadow: '4px 4px 0 0 #0d0a14, inset 0 1px 0 0 rgba(255,255,255,0.04)',
+          }}
+        >
+          {/* Corner decorations */}
+          <div className="absolute top-0 left-0 w-3 h-3 border-t-2 border-l-2 border-pixel-lime opacity-40" />
+          <div className="absolute top-0 right-0 w-3 h-3 border-t-2 border-r-2 border-pixel-lime opacity-40" />
+          <div className="absolute bottom-0 left-0 w-3 h-3 border-b-2 border-l-2 border-pixel-lime opacity-40" />
+          <div className="absolute bottom-0 right-0 w-3 h-3 border-b-2 border-r-2 border-pixel-lime opacity-40" />
+
+          <p className="font-pixel text-[9px] text-pixel-gold uppercase tracking-widest mb-3">
+            Total Balance
+          </p>
+
           {isAuthenticated && user ? (
             <>
-              <h2 className="font-sans text-5xl font-bold text-text-primary mb-2">
-                {user.balance.toLocaleString()} <span className="text-2xl text-text-secondary">SUI</span>
-              </h2>
-              <div className="inline-flex items-center gap-1 px-2 py-1 bg-pixel-green/20 border-2 border-pixel-green" style={{ borderRadius: '4px' }}>
-                <span className="text-lg">↗</span>
-                <span className="font-pixel text-xs text-pixel-green">+2.4% TODAY</span>
+              <div className="flex items-baseline gap-2 mb-1">
+                <span
+                  className="font-sans text-5xl font-bold text-text-primary"
+                  style={{ textShadow: '0 0 20px rgba(132,204,22,0.15)' }}
+                >
+                  {user.balance.toLocaleString()}
+                </span>
+                <span className="font-pixel text-[10px] text-text-secondary">SUI</span>
+              </div>
+              <div className="flex items-center gap-2 mt-2">
+                <div className="inline-flex items-center gap-1 px-2 py-0.5 bg-pixel-lime/10 border-2 border-pixel-lime">
+                  <span className="font-pixel text-[9px] text-pixel-lime">▲ +2.4%</span>
+                </div>
+                <span className="font-pixel text-[8px] text-text-muted">24H</span>
               </div>
             </>
           ) : (
             <>
-              <h2 className="font-pixel text-4xl text-text-muted mb-4">- - -</h2>
-              <Button variant="primary" size="lg" onClick={handleLogin}>
-                Connect Wallet
-              </Button>
+              <div className="mb-4">
+                <span className="font-sans text-4xl text-text-muted">$ - - -</span>
+              </div>
+              <button
+                onClick={handleConnect}
+                disabled={isProcessing}
+                className="btn-primary"
+                style={{ fontWeight: 700 }}
+              >
+                {isProcessing ? '⟳ Connecting...' : '▶ Connect Wallet'}
+              </button>
+              <p className="font-pixel text-[8px] text-text-muted text-center mt-2 tracking-wider">
+                POWERED BY ZKLOGIN
+              </p>
             </>
           )}
-        </Card>
+        </div>
       </motion.div>
 
-      {/* Quick Actions */}
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.3, delay: 0.1 }}
-      >
+      {/* ── Quick Actions 2×2 Grid ── */}
+      <motion.div variants={fadeUp}>
         <h3 className="section-header px-1">Quick Actions</h3>
-        <div className="grid grid-cols-4 gap-3">
-          {quickActions.map((action, index) => (
+        <div className="grid grid-cols-2 gap-3">
+          {quickActions.map((action) => (
             <motion.button
               key={action.label}
-              initial={{ opacity: 0, scale: 0.9 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ delay: 0.15 + index * 0.05 }}
+              variants={fadeUp}
               onClick={() => router.push(action.href)}
-              className="flex flex-col items-center gap-2 p-3 bg-surface border-2 border-border
-                         hover:border-border-light shadow-pixel transition-all duration-100
-                         active:translate-x-1 active:translate-y-1 active:shadow-pixel-sm"
-              style={{ borderRadius: '4px' }}
+              className="relative flex flex-col items-center justify-center gap-2 p-4
+                         bg-surface border-[3px] border-border
+                         transition-all duration-100
+                         active:translate-x-[2px] active:translate-y-[2px]"
+              style={{
+                boxShadow: '4px 4px 0 0 #0d0a14',
+                minHeight: '100px',
+              }}
+              whileHover={{ borderColor: '#6b5a80' }}
+              whileTap={{ x: 2, y: 2, boxShadow: '2px 2px 0 0 #0d0a14' }}
             >
-              <div className={`w-12 h-12 bg-surface-elevated border-2 border-border flex items-center justify-center text-2xl ${action.color}`}
-                   style={{ borderRadius: '4px' }}>
+              {/* Icon container */}
+              <div
+                className="w-11 h-11 flex items-center justify-center text-2xl border-2"
+                style={{
+                  background: action.bg,
+                  borderColor: action.color,
+                  color: action.color,
+                  boxShadow: `0 0 12px ${action.bg}`,
+                }}
+              >
                 {action.icon}
               </div>
-              <span className="font-pixel text-[8px] text-text-secondary uppercase">{action.label}</span>
+              <span className="font-pixel text-[9px] text-text-secondary uppercase tracking-wider">
+                {action.label}
+              </span>
+
+              {/* Subtle corner pixel */}
+              <div
+                className="absolute top-1 right-1 w-1 h-1"
+                style={{ background: action.color, opacity: 0.4 }}
+              />
             </motion.button>
           ))}
         </div>
       </motion.div>
 
-      {/* Featured Quest */}
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.3, delay: 0.2 }}
-      >
-        <h3 className="section-header px-1">Featured Quest</h3>
-        <Card
-          interactive
-          onClick={() => router.push('/quests')}
-          className="p-4"
-        >
-          <div className="flex items-center gap-4">
-            <div className="w-16 h-16 bg-pixel-gold/20 border-2 border-pixel-gold flex items-center justify-center text-4xl flex-shrink-0"
-                 style={{ borderRadius: '4px' }}>
-              🪙
-            </div>
-            <div className="flex-1 min-w-0">
-              <h4 className="font-pixel text-xs text-text-primary uppercase mb-1">Token Swap</h4>
-              <p className="font-sans text-sm text-text-secondary mb-2">Swap tokens with optimal rates</p>
-              <div className="flex items-center gap-2">
-                <span className="badge-success">Beginner</span>
-                <span className="font-pixel text-[10px] text-text-muted">~0.5% APY</span>
-              </div>
-            </div>
-            <span className="text-2xl text-text-muted">›</span>
-          </div>
-        </Card>
+      {/* ── Featured Quests ── */}
+      <motion.div variants={fadeUp}>
+        <h3 className="section-header px-1">Featured Quests</h3>
+        <div className="space-y-3">
+          {featured.map((quest) => {
+            const dc = difficultyColor[quest.difficulty] || difficultyColor.beginner;
+            const apyMap: Record<string, string> = {
+              swap: '~0.5%',
+              yield: '~8.2%',
+              leverage: '~15%',
+            };
+
+            return (
+              <motion.div
+                key={quest.id}
+                variants={fadeUp}
+                onClick={() => router.push('/quests')}
+                className="card-interactive cursor-pointer"
+              >
+                <div className="flex items-center gap-3">
+                  {/* Quest Icon */}
+                  <div
+                    className="w-12 h-12 flex-shrink-0 flex items-center justify-center text-2xl border-2 border-border bg-surface-deep"
+                    style={{
+                      boxShadow: 'inset 2px 2px 0 0 rgba(0,0,0,0.2)',
+                    }}
+                  >
+                    {quest.icon}
+                  </div>
+
+                  {/* Quest Info */}
+                  <div className="flex-1 min-w-0">
+                    <h4 className="font-pixel text-[10px] text-text-primary uppercase tracking-wide truncate">
+                      {quest.id === 'leverage' ? 'Boost Quest' : quest.title}
+                    </h4>
+                    <div className="flex items-center gap-2 mt-1.5">
+                      <span className={`inline-flex items-center px-1.5 py-0 font-pixel text-[8px] uppercase border ${dc}`}>
+                        {quest.difficulty}
+                      </span>
+                      <span className="font-pixel text-[8px] text-text-muted">
+                        {quest.steps.length} steps
+                      </span>
+                    </div>
+                  </div>
+
+                  {/* APY Badge */}
+                  <div className="flex-shrink-0 flex flex-col items-end gap-1">
+                    <span
+                      className="font-pixel text-[11px] text-pixel-lime"
+                      style={{ textShadow: '0 0 6px rgba(132,204,22,0.3)' }}
+                    >
+                      {apyMap[quest.id] || '~5%'}
+                    </span>
+                    <span className="font-pixel text-[7px] text-text-muted uppercase">APY</span>
+                  </div>
+
+                  {/* Chevron */}
+                  <span className="text-lg text-text-muted ml-1">›</span>
+                </div>
+              </motion.div>
+            );
+          })}
+        </div>
       </motion.div>
 
-      {/* Recent Activity */}
-      {isAuthenticated && (
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.3, delay: 0.3 }}
-        >
-          <h3 className="section-header px-1">Recent Activity</h3>
-          <Card className="p-0 overflow-hidden">
-            {recentActivity.map((activity, index) => (
-              <div
-                key={index}
-                className={`flex items-center gap-3 p-4 ${
-                  index !== recentActivity.length - 1 ? 'border-b-2 border-border' : ''
-                }`}
-              >
-                <div className={`w-10 h-10 bg-surface-elevated border-2 border-border flex items-center justify-center text-xl ${activity.color}`}
-                     style={{ borderRadius: '4px' }}>
-                  {activity.icon}
-                </div>
-                <div className="flex-1 min-w-0">
-                  <p className="font-sans text-base text-text-primary truncate">
-                    {activity.description}
-                  </p>
-                  <p className="font-pixel text-[10px] text-text-muted">{activity.time}</p>
-                </div>
-                <div className="w-2 h-2 bg-pixel-green" style={{ borderRadius: 0 }} />
-              </div>
-            ))}
-          </Card>
-        </motion.div>
-      )}
-
-      {/* Powered by */}
+      {/* ── Footer ── */}
       <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ delay: 0.5 }}
-        className="text-center pt-4 pb-2"
+        variants={fadeUp}
+        className="text-center pt-2 pb-2"
       >
-        <p className="font-pixel text-[10px] text-text-muted">
-          POWERED BY SUI NETWORK
+        <p className="font-pixel text-[8px] text-text-muted tracking-widest">
+          ⚡ POWERED BY SUI NETWORK ⚡
         </p>
       </motion.div>
-    </div>
+    </motion.div>
   );
 }

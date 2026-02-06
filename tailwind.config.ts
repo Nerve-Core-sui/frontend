@@ -7,47 +7,54 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        // Stardew Valley inspired pixel art palette
-        background: '#1a1520',
+        // NerveCore Mini App — Dark Purple Pixel Palette
+        background: '#1a1525',
         surface: {
-          DEFAULT: '#2d2436',
-          elevated: '#3d3346',
+          DEFAULT: '#2d2438',
+          elevated: '#3d3450',
+          deep: '#140f1e',
         },
-        // Pixel art accent colors - vibrant game-like tones
+        // Pixel art accent colors
         pixel: {
-          gold: '#f7d359',
-          goldDark: '#c9a227',
-          green: '#7bc74d',
-          greenDark: '#4a8c2a',
+          lime: '#84cc16',
+          limeDark: '#65a30d',
+          limeGlow: '#a3e635',
+          gold: '#eab308',
+          goldDark: '#ca8a04',
+          goldLight: '#facc15',
           blue: '#6dc2f2',
           blueDark: '#3d8cc2',
-          red: '#e85d5d',
-          redDark: '#a83232',
-          orange: '#f5a442',
-          purple: '#b57edc',
-          cream: '#ffecd2',
-          brown: '#9e7463',
+          red: '#ef4444',
+          redDark: '#b91c1c',
+          orange: '#f59e0b',
+          purple: '#a855f7',
+          purpleDark: '#7e22ce',
+          cream: '#fef3c7',
+          pink: '#f472b6',
         },
-        // Border colors for pixel effects
+        // Border colors
         border: {
-          DEFAULT: '#4a3f54',
-          light: '#6b5a7a',
-          pixel: '#1a1520',
+          DEFAULT: '#4a3f5c',
+          light: '#6b5a80',
+          pixel: '#0d0a14',
+          lime: '#84cc16',
         },
-        // Semantic colors
+        // Semantic
         accent: {
-          DEFAULT: '#f7d359',
-          hover: '#ffd93d',
-          muted: 'rgba(247, 211, 89, 0.1)',
+          DEFAULT: '#eab308',
+          hover: '#facc15',
+          muted: 'rgba(234, 179, 8, 0.12)',
         },
-        success: '#7bc74d',
-        warning: '#f5a442',
-        error: '#e85d5d',
-        // Text colors - warm cream tones
+        success: '#84cc16',
+        warning: '#f59e0b',
+        error: '#ef4444',
+        // Text colors
         text: {
-          primary: '#ffecd2',
-          secondary: '#d4a373',
-          muted: '#9e7463',
+          primary: '#f5f5f4',
+          secondary: '#a8a29e',
+          muted: '#6b6561',
+          lime: '#84cc16',
+          gold: '#eab308',
         },
       },
       fontFamily: {
@@ -86,11 +93,12 @@ const config: Config = {
         'scale-in': 'scaleIn 0.2s ease-out',
         'pulse-soft': 'pulseSoft 2s ease-in-out infinite',
         'spin-slow': 'spin 2s linear infinite',
-        // Pixel-specific animations
-        'pixel-bounce': 'pixelBounce 0.5s steps(4) infinite',
-        'pixel-float': 'pixelFloat 2s steps(8) infinite',
+        'pixel-bounce': 'pixelBounce 0.6s steps(6) infinite',
+        'pixel-float': 'pixelFloat 3s steps(8) infinite',
         'pixel-shake': 'pixelShake 0.3s steps(4)',
         'pixel-press': 'pixelPress 0.1s steps(2)',
+        'glow-pulse': 'glowPulse 2s ease-in-out infinite',
+        'scanline': 'scanline 8s linear infinite',
       },
       keyframes: {
         fadeIn: {
@@ -113,26 +121,33 @@ const config: Config = {
           '0%, 100%': { opacity: '1' },
           '50%': { opacity: '0.7' },
         },
-        // Stardew-style stepped animations
         pixelBounce: {
           '0%, 100%': { transform: 'translateY(0)' },
-          '50%': { transform: 'translateY(-4px)' },
+          '50%': { transform: 'translateY(-6px)' },
         },
         pixelFloat: {
           '0%, 100%': { transform: 'translateY(0)' },
-          '25%': { transform: 'translateY(-2px)' },
-          '50%': { transform: 'translateY(-4px)' },
-          '75%': { transform: 'translateY(-2px)' },
+          '25%': { transform: 'translateY(-3px)' },
+          '50%': { transform: 'translateY(-6px)' },
+          '75%': { transform: 'translateY(-3px)' },
         },
         pixelShake: {
           '0%, 100%': { transform: 'translateX(0)' },
-          '25%': { transform: 'translateX(-2px)' },
-          '50%': { transform: 'translateX(2px)' },
-          '75%': { transform: 'translateX(-2px)' },
+          '25%': { transform: 'translateX(-3px)' },
+          '50%': { transform: 'translateX(3px)' },
+          '75%': { transform: 'translateX(-3px)' },
         },
         pixelPress: {
           '0%': { transform: 'translateY(0)' },
           '100%': { transform: 'translateY(4px)' },
+        },
+        glowPulse: {
+          '0%, 100%': { boxShadow: '0 0 8px rgba(132, 204, 22, 0.3)' },
+          '50%': { boxShadow: '0 0 20px rgba(132, 204, 22, 0.6)' },
+        },
+        scanline: {
+          '0%': { backgroundPosition: '0 0' },
+          '100%': { backgroundPosition: '0 100%' },
         },
       },
     },

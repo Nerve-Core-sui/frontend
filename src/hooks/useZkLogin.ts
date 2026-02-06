@@ -1,7 +1,8 @@
 'use client';
 
-import { useState, useCallback, useEffect } from 'react';
+import { useState, useCallback } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
+import { getZkLoginSignature } from '@mysten/sui/zklogin';
 import {
   generateEphemeralKeyPair,
   createNonce,
@@ -13,6 +14,8 @@ import {
   serializeKeypair,
   deserializeKeypair,
   deriveZkLoginAddress,
+  getExtendedEphemeralPubKey,
+  ZK_LOGIN_SALT,
 } from '@/lib/zklogin/utils';
 import { generateZkProof } from '@/lib/zklogin/prover';
 import { AuthSession } from '@/types/zklogin';
@@ -38,7 +41,7 @@ export function useZkLogin() {
       setError(null);
 
       if (!GOOGLE_CLIENT_ID) {
-        throw new Error('NEXT_PUBLIC_GOOGLE_CLIENT_ID not configured');
+        throw new Error('NEXT_PUBLIC_GOOGLE_CLIENT_ID not configured. Please set it in .env.local');
       }
 
       // Generate ephemeral keypair
@@ -75,7 +78,7 @@ export function useZkLogin() {
   /**
    * Handle OAuth callback (extract JWT and generate proof)
    */
-  const handleCallback = useCallback(async () => {
+  const handleCallback = useCallback(async (): Promise<AuthSession> => {
     try {
       setIsProcessing(true);
       setError(null);
@@ -93,7 +96,7 @@ export function useZkLogin() {
       const maxEpoch = sessionStorage.getItem(TEMP_MAX_EPOCH_KEY);
 
       if (!serializedKeypair || !expectedNonce || !randomness || !maxEpoch) {
-        throw new Error('Missing temporary authentication data');
+        throw new Error('Missing temporary authentication data. Please try logging in again.');
       }
 
       // Validate nonce
@@ -102,24 +105,23 @@ export function useZkLogin() {
       }
 
       // Decode JWT to get user info
-      const jwtPayload = decodeJwt(jwt);
-      const salt = jwtPayload.sub; // Use sub as salt (in production, use a proper salt)
+      decodeJwt(jwt);
 
-      // Deserialize keypair
+      // Deserialize keypair and get extended ephemeral public key
       const keypair = deserializeKeypair(JSON.parse(serializedKeypair));
-      const publicKeyBase64 = Buffer.from(keypair.getPublicKey().toRawBytes()).toString('base64');
+      const extendedEphemeralPublicKey = getExtendedEphemeralPubKey(keypair);
 
       // Generate zkLogin proof
       const zkProof = await generateZkProof({
         jwt,
-        ephemeralPublicKey: publicKeyBase64,
+        ephemeralPublicKey: extendedEphemeralPublicKey,
         maxEpoch: parseInt(maxEpoch, 10),
         randomness,
-        salt,
+        salt: ZK_LOGIN_SALT,
       });
 
-      // Derive Sui address
-      const address = deriveZkLoginAddress(jwt, salt);
+      // Derive Sui address using real jwtToAddress
+      const address = deriveZkLoginAddress(jwt, ZK_LOGIN_SALT);
 
       // Create session
       const newSession: AuthSession = {
@@ -177,47 +179,40 @@ export function useZkLogin() {
   }, [session]);
 
   /**
-   * Sign transaction with zkLogin
-   * TODO: Implement actual transaction signing
+   * Sign transaction bytes with zkLogin
+   * Combines ephemeral signature with ZK proof to create a valid zkLogin signature
    */
-  const signTransaction = useCallback(async (transaction: unknown) => {
+  const signTransaction = useCallback(async (txBytes: Uint8Array): Promise<string> => {
     if (!session) {
       throw new Error('Not authenticated');
     }
+    if (!session.zkProof) {
+      throw new Error('No ZK proof available');
+    }
 
     try {
-      // Deserialize keypair
       const keypair = deserializeKeypair(session.ephemeralKeyPair);
 
-      // In production, this would use getZkLoginSignature from @mysten/zklogin
-      // to create a proper zkLogin signature combining the ephemeral signature
-      // and the zkProof
+      // Sign the transaction bytes with the ephemeral keypair
+      const { signature: ephemeralSignature } = await keypair.signTransaction(txBytes);
 
-      // Placeholder implementation
-      console.warn('signTransaction not fully implemented');
+      // Combine with ZK proof to create zkLogin signature
+      const zkLoginSignature = getZkLoginSignature({
+        inputs: {
+          ...session.zkProof,
+          addressSeed: ZK_LOGIN_SALT,
+        },
+        maxEpoch: session.maxEpoch,
+        userSignature: ephemeralSignature,
+      });
 
-      // For now, just sign with ephemeral key (NOT SECURE - for development only)
-      const signature = await keypair.signPersonalMessage(
-        new TextEncoder().encode(JSON.stringify(transaction))
-      );
-
-      return signature;
+      return zkLoginSignature;
     } catch (err) {
       const message = err instanceof Error ? err.message : 'Transaction signing failed';
       console.error('Sign transaction error:', message);
       throw new Error(message);
     }
   }, [session]);
-
-  // Auto-detect OAuth callback
-  useEffect(() => {
-    if (typeof window === 'undefined') return;
-
-    // Check if we're on the callback page with JWT in hash
-    if (window.location.hash.includes('id_token=') && !session) {
-      handleCallback().catch(console.error);
-    }
-  }, [handleCallback, session]);
 
   return {
     isAuthenticated: session?.isAuthenticated || false,
