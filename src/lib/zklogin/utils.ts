@@ -1,5 +1,5 @@
 // zkLogin utility functions
-import { Ed25519Keypair } from '@mysten/sui.js/keypairs/ed25519';
+import { Ed25519Keypair, Ed25519PublicKey } from '@mysten/sui.js/keypairs/ed25519';
 import { generateNonce, generateRandomness } from '@mysten/zklogin';
 import { jwtDecode } from 'jwt-decode';
 import { JWTPayload, GoogleOAuthConfig } from '@/types/zklogin';
@@ -11,19 +11,22 @@ const MAX_EPOCH = 10; // Epochs until ephemeral key expires
  */
 export function generateEphemeralKeyPair(): { keypair: Ed25519Keypair; randomness: string } {
   const randomness = generateRandomness();
-  const keypair = Ed25519Keypair.fromSecretKey(randomness);
+  // Generate a new random keypair (randomness is used separately for nonce)
+  const keypair = new Ed25519Keypair();
 
-  return { keypair, randomness: Buffer.from(randomness).toString('base64') };
+  return { keypair, randomness };
 }
 
 /**
  * Create nonce from ephemeral public key
  */
-export function createNonce(publicKey: Uint8Array, maxEpoch: number, randomness: string): string {
+export function createNonce(publicKey: Ed25519PublicKey, maxEpoch: number, randomness: string): string {
+  // Type assertion needed due to version mismatch between @mysten/sui.js and @mysten/zklogin
   const nonce = generateNonce(
-    publicKey,
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    publicKey as any,
     maxEpoch,
-    Buffer.from(randomness, 'base64')
+    randomness
   );
   return nonce;
 }
@@ -128,7 +131,7 @@ export function serializeKeypair(keypair: Ed25519Keypair): {
 } {
   return {
     privateKey: Buffer.from(keypair.getSecretKey()).toString('base64'),
-    publicKey: Buffer.from(keypair.getPublicKey().toBytes()).toString('base64'),
+    publicKey: Buffer.from(keypair.getPublicKey().toRawBytes()).toString('base64'),
   };
 }
 

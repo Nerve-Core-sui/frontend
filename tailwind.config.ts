@@ -2,72 +2,142 @@ import type { Config } from "tailwindcss";
 
 const config: Config = {
   content: [
-    "./pages/**/*.{js,ts,jsx,tsx,mdx}",
-    "./components/**/*.{js,ts,jsx,tsx,mdx}",
-    "./app/**/*.{js,ts,jsx,tsx,mdx}",
+    "./src/**/*.{js,ts,jsx,tsx,mdx}",
   ],
   theme: {
     extend: {
       colors: {
-        background: "var(--background)",
-        foreground: "var(--foreground)",
-        dark: {
-          900: '#0a0a0f',
-          800: '#12121a',
-          700: '#1a1a26',
-          600: '#232333',
+        // Stardew Valley inspired pixel art palette
+        background: '#1a1520',
+        surface: {
+          DEFAULT: '#2d2436',
+          elevated: '#3d3346',
         },
-        gold: {
-          500: '#ffd700',
-          600: '#e6c200',
-          400: '#ffed4e',
+        // Pixel art accent colors - vibrant game-like tones
+        pixel: {
+          gold: '#f7d359',
+          goldDark: '#c9a227',
+          green: '#7bc74d',
+          greenDark: '#4a8c2a',
+          blue: '#6dc2f2',
+          blueDark: '#3d8cc2',
+          red: '#e85d5d',
+          redDark: '#a83232',
+          orange: '#f5a442',
+          purple: '#b57edc',
+          cream: '#ffecd2',
+          brown: '#9e7463',
         },
-        purple: {
-          500: '#8b5cf6',
-          600: '#7c3aed',
-          400: '#a78bfa',
+        // Border colors for pixel effects
+        border: {
+          DEFAULT: '#4a3f54',
+          light: '#6b5a7a',
+          pixel: '#1a1520',
         },
-        fantasy: {
-          red: '#ef4444',
-          green: '#22c55e',
-          amber: '#f59e0b',
+        // Semantic colors
+        accent: {
+          DEFAULT: '#f7d359',
+          hover: '#ffd93d',
+          muted: 'rgba(247, 211, 89, 0.1)',
+        },
+        success: '#7bc74d',
+        warning: '#f5a442',
+        error: '#e85d5d',
+        // Text colors - warm cream tones
+        text: {
+          primary: '#ffecd2',
+          secondary: '#d4a373',
+          muted: '#9e7463',
         },
       },
       fontFamily: {
-        'fantasy': ['var(--font-cinzel)', 'serif'],
-        'body': ['Inter', 'sans-serif'],
+        // Pixel fonts for authentic retro feel
+        pixel: ['var(--font-pixel)', 'monospace'],
+        'pixel-body': ['var(--font-pixel-body)', 'monospace'],
+        sans: ['var(--font-pixel-body)', 'monospace'],
       },
-      backgroundImage: {
-        'fantasy-gradient': 'linear-gradient(135deg, #8b5cf6 0%, #ffd700 100%)',
-        'dark-pattern': "url(\"data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.02'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v6h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E\")",
+      spacing: {
+        'safe-top': 'env(safe-area-inset-top)',
+        'safe-bottom': 'env(safe-area-inset-bottom)',
+        'safe-left': 'env(safe-area-inset-left)',
+        'safe-right': 'env(safe-area-inset-right)',
+      },
+      borderRadius: {
+        'pixel': '0px',
+        '2xl': '1rem',
+        '3xl': '1.5rem',
       },
       boxShadow: {
-        'gold': '0 0 20px rgba(255, 215, 0, 0.4)',
-        'gold-lg': '0 0 40px rgba(255, 215, 0, 0.6)',
-        'purple': '0 0 20px rgba(139, 92, 246, 0.4)',
-        'fantasy': '0 4px 20px rgba(0, 0, 0, 0.8), inset 0 1px 1px rgba(255, 255, 255, 0.1)',
+        // Pixel-style shadows using box-shadow technique
+        'pixel': '4px 4px 0px 0px #1a1520',
+        'pixel-sm': '2px 2px 0px 0px #1a1520',
+        'pixel-lg': '6px 6px 0px 0px #1a1520',
+        'pixel-gold': '4px 4px 0px 0px #c9a227',
+        'pixel-green': '4px 4px 0px 0px #4a8c2a',
+        'pixel-inset': 'inset 2px 2px 0px 0px rgba(0,0,0,0.3)',
+        'card': '0 1px 3px rgba(0,0,0,0.3), 0 1px 2px rgba(0,0,0,0.2)',
+        'card-hover': '0 4px 12px rgba(0,0,0,0.4)',
+        'sheet': '0 -4px 20px rgba(0,0,0,0.5)',
       },
       animation: {
-        'glow': 'glow 2s ease-in-out infinite alternate',
-        'float': 'float 3s ease-in-out infinite',
-        'shimmer': 'shimmer 2s linear infinite',
+        'fade-in': 'fadeIn 0.2s ease-out',
+        'slide-up': 'slideUp 0.3s ease-out',
+        'slide-down': 'slideDown 0.3s ease-out',
+        'scale-in': 'scaleIn 0.2s ease-out',
+        'pulse-soft': 'pulseSoft 2s ease-in-out infinite',
+        'spin-slow': 'spin 2s linear infinite',
+        // Pixel-specific animations
+        'pixel-bounce': 'pixelBounce 0.5s steps(4) infinite',
+        'pixel-float': 'pixelFloat 2s steps(8) infinite',
+        'pixel-shake': 'pixelShake 0.3s steps(4)',
+        'pixel-press': 'pixelPress 0.1s steps(2)',
       },
       keyframes: {
-        glow: {
-          '0%': { boxShadow: '0 0 5px rgba(255, 215, 0, 0.5), 0 0 10px rgba(255, 215, 0, 0.3)' },
-          '100%': { boxShadow: '0 0 20px rgba(255, 215, 0, 0.8), 0 0 30px rgba(255, 215, 0, 0.4)' },
+        fadeIn: {
+          '0%': { opacity: '0' },
+          '100%': { opacity: '1' },
         },
-        float: {
-          '0%, 100%': { transform: 'translateY(0px)' },
-          '50%': { transform: 'translateY(-10px)' },
+        slideUp: {
+          '0%': { transform: 'translateY(100%)' },
+          '100%': { transform: 'translateY(0)' },
         },
-        shimmer: {
-          '0%': { backgroundPosition: '-200% 0' },
-          '100%': { backgroundPosition: '200% 0' },
+        slideDown: {
+          '0%': { transform: 'translateY(-20px)', opacity: '0' },
+          '100%': { transform: 'translateY(0)', opacity: '1' },
+        },
+        scaleIn: {
+          '0%': { transform: 'scale(0.95)', opacity: '0' },
+          '100%': { transform: 'scale(1)', opacity: '1' },
+        },
+        pulseSoft: {
+          '0%, 100%': { opacity: '1' },
+          '50%': { opacity: '0.7' },
+        },
+        // Stardew-style stepped animations
+        pixelBounce: {
+          '0%, 100%': { transform: 'translateY(0)' },
+          '50%': { transform: 'translateY(-4px)' },
+        },
+        pixelFloat: {
+          '0%, 100%': { transform: 'translateY(0)' },
+          '25%': { transform: 'translateY(-2px)' },
+          '50%': { transform: 'translateY(-4px)' },
+          '75%': { transform: 'translateY(-2px)' },
+        },
+        pixelShake: {
+          '0%, 100%': { transform: 'translateX(0)' },
+          '25%': { transform: 'translateX(-2px)' },
+          '50%': { transform: 'translateX(2px)' },
+          '75%': { transform: 'translateX(-2px)' },
+        },
+        pixelPress: {
+          '0%': { transform: 'translateY(0)' },
+          '100%': { transform: 'translateY(4px)' },
         },
       },
     },
   },
   plugins: [],
 };
+
 export default config;

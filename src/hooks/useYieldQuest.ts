@@ -38,6 +38,7 @@ export function useYieldQuest(): UseYieldQuestReturn {
    * Shows battle animation during transaction
    */
   const deposit = useCallback(
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     async (msuiCoinId: string, amount: number): Promise<DepositResult> => {
       setIsProcessing(true);
 
@@ -67,6 +68,8 @@ export function useYieldQuest(): UseYieldQuestReturn {
         updateStep(0, 'in-progress');
         await new Promise((resolve) => setTimeout(resolve, 800));
 
+        // Note: tx is prepared but not executed in this mock implementation
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
         const tx = buildDepositTransaction(
           PACKAGE_ID,
           LENDING_POOL,
@@ -151,6 +154,8 @@ export function useYieldQuest(): UseYieldQuestReturn {
         updateStep(0, 'in-progress');
         await new Promise((resolve) => setTimeout(resolve, 800));
 
+        // Note: tx is prepared but not executed in this mock implementation
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
         const tx = buildWithdrawTransaction(PACKAGE_ID, LENDING_POOL, receiptId);
 
         updateStep(0, 'completed');

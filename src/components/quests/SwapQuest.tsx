@@ -1,11 +1,11 @@
-'use client';
+"use client";
 
-import React, { useState, useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { X, ArrowDownUp, Info, TrendingUp, AlertCircle } from 'lucide-react';
-import { useSwapQuest } from '@/hooks/useSwapQuest';
-import { SwapDirection } from '@/lib/ptb/swap';
-import { formatSwapAmount } from '@/lib/ptb/swap';
+import React, { useState, useEffect } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import { X, ArrowDownUp, Info, TrendingUp, AlertCircle } from "lucide-react";
+import { useSwapQuest } from "@/hooks/useSwapQuest";
+import { SwapDirection } from "@/lib/ptb/swap";
+import { formatSwapAmount } from "@/lib/ptb/swap";
 
 interface SwapQuestProps {
   isOpen: boolean;
@@ -26,9 +26,9 @@ export const SwapQuest: React.FC<SwapQuestProps> = ({ isOpen, onClose }) => {
     txSuccess,
   } = useSwapQuest();
 
-  const [amount, setAmount] = useState('');
+  const [amount, setAmount] = useState("");
   const [slippage, setSlippage] = useState(1);
-  const [direction, setDirection] = useState<SwapDirection>('msui_to_musdc');
+  const [direction, setDirection] = useState<SwapDirection>("msui_to_musdc");
   const [showAdvanced, setShowAdvanced] = useState(false);
 
   // Get quote when amount changes
@@ -44,7 +44,7 @@ export const SwapQuest: React.FC<SwapQuestProps> = ({ isOpen, onClose }) => {
 
   const handleSwapDirection = () => {
     setDirection((prev) =>
-      prev === 'msui_to_musdc' ? 'musdc_to_msui' : 'msui_to_musdc'
+      prev === "msui_to_musdc" ? "musdc_to_msui" : "msui_to_musdc",
     );
   };
 
@@ -56,15 +56,15 @@ export const SwapQuest: React.FC<SwapQuestProps> = ({ isOpen, onClose }) => {
   };
 
   const handleClose = () => {
-    setAmount('');
+    setAmount("");
     setSlippage(1);
-    setDirection('msui_to_musdc');
+    setDirection("msui_to_musdc");
     setShowAdvanced(false);
     onClose();
   };
 
-  const inputToken = direction === 'msui_to_musdc' ? 'MSUI' : 'MUSDC';
-  const outputToken = direction === 'msui_to_musdc' ? 'MUSDC' : 'MSUI';
+  const inputToken = direction === "msui_to_musdc" ? "MSUI" : "MUSDC";
+  const outputToken = direction === "msui_to_musdc" ? "MUSDC" : "MSUI";
 
   return (
     <AnimatePresence>
@@ -84,7 +84,7 @@ export const SwapQuest: React.FC<SwapQuestProps> = ({ isOpen, onClose }) => {
             initial={{ opacity: 0, scale: 0.9, y: 20 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.9, y: 20 }}
-            transition={{ type: 'spring', damping: 25, stiffness: 300 }}
+            transition={{ type: "spring", damping: 25, stiffness: 300 }}
             className="fixed inset-0 z-50 flex items-center justify-center p-4 pointer-events-none"
           >
             <div className="relative w-full max-w-lg pointer-events-auto">
@@ -104,7 +104,9 @@ export const SwapQuest: React.FC<SwapQuestProps> = ({ isOpen, onClose }) => {
                         <h2 className="text-2xl font-fantasy bg-gradient-to-r from-gold-400 to-gold-600 bg-clip-text text-transparent">
                           Token Swap Quest
                         </h2>
-                        <p className="text-sm text-gray-400">Exchange tokens at market rates</p>
+                        <p className="text-sm text-gray-400">
+                          Exchange tokens at market rates
+                        </p>
                       </div>
                     </div>
                     <button
@@ -120,7 +122,9 @@ export const SwapQuest: React.FC<SwapQuestProps> = ({ isOpen, onClose }) => {
                 <div className="relative p-6 space-y-4">
                   {/* Input Token */}
                   <div className="space-y-2">
-                    <label className="text-sm font-semibold text-gray-300">You Pay</label>
+                    <label className="text-sm font-semibold text-gray-300">
+                      You Pay
+                    </label>
                     <div className="relative">
                       <input
                         type="number"
@@ -131,7 +135,9 @@ export const SwapQuest: React.FC<SwapQuestProps> = ({ isOpen, onClose }) => {
                         disabled={isExecuting}
                       />
                       <div className="absolute right-4 top-1/2 -translate-y-1/2 flex items-center gap-2 px-3 py-2 bg-dark-800 rounded-lg border border-gold-500/30">
-                        <span className="text-sm font-bold text-gold-400">{inputToken}</span>
+                        <span className="text-sm font-bold text-gold-400">
+                          {inputToken}
+                        </span>
                       </div>
                     </div>
                   </div>
@@ -149,7 +155,9 @@ export const SwapQuest: React.FC<SwapQuestProps> = ({ isOpen, onClose }) => {
 
                   {/* Output Token */}
                   <div className="space-y-2">
-                    <label className="text-sm font-semibold text-gray-300">You Receive</label>
+                    <label className="text-sm font-semibold text-gray-300">
+                      You Receive
+                    </label>
                     <div className="relative">
                       <div className="w-full bg-dark-700/50 border border-gold-500/20 rounded-xl px-4 py-4 text-2xl font-bold text-gray-300">
                         {isLoadingQuote ? (
@@ -161,7 +169,9 @@ export const SwapQuest: React.FC<SwapQuestProps> = ({ isOpen, onClose }) => {
                         )}
                       </div>
                       <div className="absolute right-4 top-1/2 -translate-y-1/2 flex items-center gap-2 px-3 py-2 bg-dark-800 rounded-lg border border-gold-500/30">
-                        <span className="text-sm font-bold text-gold-400">{outputToken}</span>
+                        <span className="text-sm font-bold text-gold-400">
+                          {outputToken}
+                        </span>
                       </div>
                     </div>
                   </div>
@@ -176,7 +186,8 @@ export const SwapQuest: React.FC<SwapQuestProps> = ({ isOpen, onClose }) => {
                       <div className="flex items-center justify-between text-sm">
                         <span className="text-gray-400">Exchange Rate</span>
                         <span className="text-white font-semibold">
-                          1 {inputToken} = {quote.exchangeRate.toFixed(4)} {outputToken}
+                          1 {inputToken} = {quote.exchangeRate.toFixed(4)}{" "}
+                          {outputToken}
                         </span>
                       </div>
                       <div className="flex items-center justify-between text-sm">
@@ -190,10 +201,10 @@ export const SwapQuest: React.FC<SwapQuestProps> = ({ isOpen, onClose }) => {
                         <span
                           className={`font-semibold ${
                             quote.priceImpact > 5
-                              ? 'text-red-400'
+                              ? "text-red-400"
                               : quote.priceImpact > 2
-                              ? 'text-yellow-400'
-                              : 'text-green-400'
+                                ? "text-yellow-400"
+                                : "text-green-400"
                           }`}
                         >
                           {quote.priceImpact.toFixed(2)}%
@@ -213,7 +224,7 @@ export const SwapQuest: React.FC<SwapQuestProps> = ({ isOpen, onClose }) => {
                         onClick={() => setShowAdvanced(!showAdvanced)}
                         className="text-xs text-gold-400 hover:text-gold-300 transition-colors"
                       >
-                        {showAdvanced ? 'Hide' : 'Show'} Settings
+                        {showAdvanced ? "Hide" : "Show"} Settings
                       </button>
                     </div>
 
@@ -221,7 +232,7 @@ export const SwapQuest: React.FC<SwapQuestProps> = ({ isOpen, onClose }) => {
                       {showAdvanced && (
                         <motion.div
                           initial={{ height: 0, opacity: 0 }}
-                          animate={{ height: 'auto', opacity: 1 }}
+                          animate={{ height: "auto", opacity: 1 }}
                           exit={{ height: 0, opacity: 0 }}
                           className="overflow-hidden"
                         >
@@ -233,8 +244,8 @@ export const SwapQuest: React.FC<SwapQuestProps> = ({ isOpen, onClose }) => {
                                 disabled={isExecuting}
                                 className={`flex-1 py-2 rounded-lg border-2 font-semibold text-sm transition-all disabled:opacity-50 disabled:cursor-not-allowed ${
                                   slippage === option
-                                    ? 'bg-gold-500/20 border-gold-500 text-gold-400'
-                                    : 'bg-dark-700 border-gold-500/30 text-gray-400 hover:border-gold-500/60'
+                                    ? "bg-gold-500/20 border-gold-500 text-gold-400"
+                                    : "bg-dark-700 border-gold-500/30 text-gray-400 hover:border-gold-500/60"
                                 }`}
                               >
                                 {option}%
@@ -253,9 +264,14 @@ export const SwapQuest: React.FC<SwapQuestProps> = ({ isOpen, onClose }) => {
                       animate={{ opacity: 1, y: 0 }}
                       className="bg-red-500/10 border border-red-500/30 rounded-xl p-4 flex items-start gap-3"
                     >
-                      <AlertCircle size={20} className="text-red-400 flex-shrink-0 mt-0.5" />
+                      <AlertCircle
+                        size={20}
+                        className="text-red-400 flex-shrink-0 mt-0.5"
+                      />
                       <div>
-                        <p className="text-sm font-semibold text-red-400">Transaction Failed</p>
+                        <p className="text-sm font-semibold text-red-400">
+                          Transaction Failed
+                        </p>
                         <p className="text-xs text-red-300/80 mt-1">{error}</p>
                       </div>
                     </motion.div>
@@ -268,11 +284,17 @@ export const SwapQuest: React.FC<SwapQuestProps> = ({ isOpen, onClose }) => {
                       animate={{ opacity: 1, y: 0 }}
                       className="bg-green-500/10 border border-green-500/30 rounded-xl p-4 flex items-start gap-3"
                     >
-                      <TrendingUp size={20} className="text-green-400 flex-shrink-0 mt-0.5" />
+                      <TrendingUp
+                        size={20}
+                        className="text-green-400 flex-shrink-0 mt-0.5"
+                      />
                       <div className="flex-1">
-                        <p className="text-sm font-semibold text-green-400">Swap Successful!</p>
+                        <p className="text-sm font-semibold text-green-400">
+                          Swap Successful!
+                        </p>
                         <p className="text-xs text-green-300/80 mt-1">
-                          Transaction: {txDigest.slice(0, 8)}...{txDigest.slice(-6)}
+                          Transaction: {txDigest.slice(0, 8)}...
+                          {txDigest.slice(-6)}
                         </p>
                       </div>
                     </motion.div>
@@ -281,10 +303,15 @@ export const SwapQuest: React.FC<SwapQuestProps> = ({ isOpen, onClose }) => {
                   {/* Start Quest Button */}
                   <button
                     onClick={handleStartQuest}
-                    disabled={!amount || parseFloat(amount) <= 0 || isExecuting || isLoadingQuote}
+                    disabled={
+                      !amount ||
+                      parseFloat(amount) <= 0 ||
+                      isExecuting ||
+                      isLoadingQuote
+                    }
                     className="w-full py-4 rounded-xl font-bold text-lg bg-gradient-to-r from-gold-500 to-gold-600 hover:from-gold-400 hover:to-gold-500 text-dark-900 shadow-[0_4px_20px_rgba(255,215,0,0.3)] hover:shadow-[0_6px_30px_rgba(255,215,0,0.5)] transition-all disabled:opacity-50 disabled:cursor-not-allowed disabled:shadow-none transform hover:scale-[1.02] active:scale-[0.98]"
                   >
-                    {isExecuting ? 'Swapping...' : 'Start Quest'}
+                    {isExecuting ? "Swapping..." : "Start Quest"}
                   </button>
                 </div>
               </div>

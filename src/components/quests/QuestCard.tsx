@@ -1,12 +1,9 @@
 'use client';
 
 import React from 'react';
-import { clsx } from 'clsx';
 import { motion } from 'framer-motion';
-import { Sparkles } from 'lucide-react';
+import { ChevronRight } from 'lucide-react';
 import { Quest } from '@/lib/quests';
-import { DifficultyBadge } from './DifficultyBadge';
-import { RiskIndicator } from './RiskIndicator';
 
 export interface QuestCardProps {
   quest: Quest;
@@ -14,139 +11,82 @@ export interface QuestCardProps {
   delay?: number;
 }
 
+const difficultyColors = {
+  beginner: 'bg-success/10 text-success',
+  intermediate: 'bg-warning/10 text-warning',
+  advanced: 'bg-error/10 text-error',
+};
+
+const riskLabels = {
+  low: { label: 'Low Risk', color: 'text-success' },
+  medium: { label: 'Medium Risk', color: 'text-warning' },
+  high: { label: 'High Risk', color: 'text-error' },
+};
+
 export const QuestCard: React.FC<QuestCardProps> = ({ quest, onClick, delay = 0 }) => {
   return (
     <motion.div
-      initial={{ opacity: 0, y: 20, scale: 0.95 }}
-      animate={{ opacity: 1, y: 0, scale: 1 }}
-      transition={{
-        duration: 0.4,
-        delay,
-        ease: [0.23, 1, 0.32, 1],
-      }}
-      whileHover={{
-        y: -8,
-        transition: { duration: 0.2 }
-      }}
+      initial={{ opacity: 0, y: 10 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.2, delay }}
+      whileTap={{ scale: 0.98 }}
       onClick={onClick}
-      className="group cursor-pointer"
+      className="bg-surface rounded-2xl border border-border p-4 cursor-pointer
+                 transition-all duration-200 hover:border-border-subtle hover:shadow-card-hover
+                 active:scale-[0.98]"
     >
-      <div
-        className={clsx(
-          'relative h-full',
-          'bg-gradient-to-br from-dark-800 via-dark-800 to-dark-900',
-          'border-2 border-gold-500/20 rounded-xl',
-          'shadow-[0_4px_20px_rgba(0,0,0,0.5)]',
-          'transition-all duration-300',
-          'overflow-hidden',
-          'group-hover:border-gold-500/60',
-          'group-hover:shadow-[0_8px_30px_rgba(255,215,0,0.2),inset_0_1px_1px_rgba(255,255,255,0.1)]',
-          'before:absolute before:inset-0',
-          'before:bg-[url("data:image/svg+xml,%3Csvg width=\'60\' height=\'60\' viewBox=\'0 0 60 60\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cg fill=\'none\' fill-rule=\'evenodd\'%3E%3Cg fill=\'%23ffffff\' fill-opacity=\'0.02\'%3E%3Cpath d=\'M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v6h4v4h2V6h4V4H6z\'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")]',
-          'before:pointer-events-none'
-        )}
-      >
-        {/* Glow effect on hover */}
-        <div className="absolute inset-0 bg-gradient-to-br from-purple-500/0 via-gold-500/0 to-purple-500/0 group-hover:from-purple-500/5 group-hover:via-gold-500/5 group-hover:to-purple-500/5 transition-all duration-500 pointer-events-none" />
+      <div className="flex items-start gap-4">
+        {/* Icon */}
+        <div className="flex-shrink-0 w-12 h-12 bg-surface-elevated rounded-xl flex items-center justify-center text-2xl">
+          {quest.icon}
+        </div>
 
-        {/* Top decorative border */}
-        <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-transparent via-gold-500/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-
-        <div className="relative p-6 flex flex-col h-full">
-          {/* Quest Icon - Large and prominent */}
-          <div className="flex justify-center mb-4">
-            <motion.div
-              className={clsx(
-                'relative w-24 h-24 rounded-2xl',
-                'bg-gradient-to-br from-dark-700 to-dark-900',
-                'border-2 border-gold-500/30',
-                'flex items-center justify-center',
-                'shadow-[0_0_20px_rgba(0,0,0,0.5),inset_0_1px_2px_rgba(255,255,255,0.1)]',
-                'group-hover:border-gold-500/60',
-                'group-hover:shadow-[0_0_30px_rgba(255,215,0,0.3),inset_0_1px_2px_rgba(255,255,255,0.2)]',
-                'transition-all duration-300'
-              )}
-              whileHover={{ rotate: [0, -5, 5, 0], transition: { duration: 0.5 } }}
-            >
-              <span className="text-5xl drop-shadow-[0_2px_8px_rgba(0,0,0,0.8)]">
-                {quest.icon}
-              </span>
-
-              {/* Corner decorations */}
-              <div className="absolute -top-1 -left-1 w-3 h-3 border-t-2 border-l-2 border-gold-500/50" />
-              <div className="absolute -top-1 -right-1 w-3 h-3 border-t-2 border-r-2 border-gold-500/50" />
-              <div className="absolute -bottom-1 -left-1 w-3 h-3 border-b-2 border-l-2 border-gold-500/50" />
-              <div className="absolute -bottom-1 -right-1 w-3 h-3 border-b-2 border-r-2 border-gold-500/50" />
-            </motion.div>
-          </div>
-
-          {/* Quest Title */}
-          <h3 className={clsx(
-            'text-2xl font-fantasy text-center mb-3',
-            'bg-gradient-to-r from-gold-400 via-gold-500 to-gold-400 bg-clip-text text-transparent',
-            'group-hover:from-gold-300 group-hover:via-gold-400 group-hover:to-gold-300',
-            'transition-all duration-300',
-            'drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]'
-          )}>
+        {/* Content */}
+        <div className="flex-1 min-w-0">
+          {/* Title */}
+          <h3 className="text-base font-semibold text-text-primary mb-1 truncate">
             {quest.title}
           </h3>
 
-          {/* Badges Row */}
-          <div className="flex items-center justify-center gap-2 mb-4">
-            <DifficultyBadge difficulty={quest.difficulty} />
-            <RiskIndicator risk={quest.risk} showLabel={false} />
-          </div>
-
           {/* Description */}
-          <p className="text-gray-300 text-sm text-center leading-relaxed mb-4 flex-grow">
+          <p className="text-sm text-text-secondary line-clamp-2 mb-3">
             {quest.description}
           </p>
 
-          {/* Divider */}
-          <div className="h-px bg-gradient-to-r from-transparent via-gold-500/30 to-transparent mb-4" />
+          {/* Meta row */}
+          <div className="flex items-center gap-2 flex-wrap">
+            {/* Difficulty badge */}
+            <span className={`inline-flex items-center px-2 py-0.5 text-xs font-medium rounded-full ${difficultyColors[quest.difficulty]}`}>
+              {quest.difficulty.charAt(0).toUpperCase() + quest.difficulty.slice(1)}
+            </span>
 
-          {/* Reward Section */}
-          <div className="flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg bg-dark-900/60 border border-gold-500/30 group-hover:border-gold-500/50 transition-colors duration-300">
-            <Sparkles size={16} className="text-gold-500" />
-            <span className="text-sm font-semibold text-gold-400">
-              Reward: {quest.estimatedReward}
+            {/* Risk indicator */}
+            <span className={`text-xs ${riskLabels[quest.risk].color}`}>
+              {riskLabels[quest.risk].label}
+            </span>
+
+            {/* Steps count */}
+            <span className="text-xs text-text-muted">
+              {quest.steps.length} steps
             </span>
           </div>
-
-          {/* Steps Preview */}
-          <div className="mt-4 pt-4 border-t border-gold-500/10">
-            <div className="flex items-center justify-center gap-1 text-xs text-gray-400">
-              <span className="font-semibold">{quest.steps.length} Steps</span>
-              <span className="text-gold-500/50">•</span>
-              <span className="capitalize">{quest.category}</span>
-            </div>
-          </div>
-
-          {/* Hover indicator */}
-          <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-gradient-to-r from-purple-500 via-gold-500 to-purple-500 scale-x-0 group-hover:scale-x-100 transition-transform duration-500 origin-center" />
         </div>
 
-        {/* Shimmer effect */}
-        <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-700 pointer-events-none">
-          <div
-            className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent"
-            style={{
-              animation: 'shimmer 2s infinite',
-            }}
-          />
+        {/* Chevron */}
+        <div className="flex-shrink-0 self-center">
+          <ChevronRight size={20} className="text-text-muted" />
         </div>
       </div>
 
-      <style jsx>{`
-        @keyframes shimmer {
-          0% {
-            transform: translateX(-100%);
-          }
-          100% {
-            transform: translateX(100%);
-          }
-        }
-      `}</style>
+      {/* Reward bar */}
+      <div className="mt-4 pt-3 border-t border-border">
+        <div className="flex items-center justify-between">
+          <span className="text-xs text-text-muted">Estimated Reward</span>
+          <span className="text-sm font-semibold text-accent">
+            {quest.estimatedReward}
+          </span>
+        </div>
+      </div>
     </motion.div>
   );
 };

@@ -1,5 +1,4 @@
 import { Transaction } from '@mysten/sui/transactions';
-import { PACKAGE_ID, SWAP_POOL } from '../contracts';
 
 export type SwapDirection = 'msui_to_musdc' | 'musdc_to_msui';
 

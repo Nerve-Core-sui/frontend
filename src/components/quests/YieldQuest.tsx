@@ -1,11 +1,10 @@
-'use client';
+"use client";
 
-import React, { useState } from 'react';
-import { motion } from 'framer-motion';
-import { TrendingUp, Coins, ArrowRight, Info, Vault } from 'lucide-react';
-import { useYieldQuest } from '@/hooks/useYieldQuest';
-import { estimateEarnings, formatAPY } from '@/lib/ptb/yield';
-import { parseTokenAmount, formatTokenAmount } from '@/lib/contracts';
+import React, { useState } from "react";
+import { motion } from "framer-motion";
+import { TrendingUp, Coins, ArrowRight, Info, Vault } from "lucide-react";
+import { useYieldQuest } from "@/hooks/useYieldQuest";
+import { estimateEarnings, formatAPY } from "@/lib/ptb/yield";
 
 export interface YieldQuestProps {
   onClose: () => void;
@@ -15,8 +14,11 @@ export interface YieldQuestProps {
 // Mock APY - in production this would come from the contract
 const CURRENT_APY = 5.0;
 
-export const YieldQuest: React.FC<YieldQuestProps> = ({ onClose, userMSUIBalance = 1000 }) => {
-  const [depositAmount, setDepositAmount] = useState<string>('');
+export const YieldQuest: React.FC<YieldQuestProps> = ({
+  onClose,
+  userMSUIBalance = 1000,
+}) => {
+  const [depositAmount, setDepositAmount] = useState<string>("");
   const { deposit, isProcessing } = useYieldQuest();
 
   const numericAmount = parseFloat(depositAmount) || 0;
@@ -26,12 +28,12 @@ export const YieldQuest: React.FC<YieldQuestProps> = ({ onClose, userMSUIBalance
 
   const handleStartQuest = async () => {
     if (!depositAmount || numericAmount <= 0) {
-      alert('Please enter a valid deposit amount');
+      alert("Please enter a valid deposit amount");
       return;
     }
 
     if (numericAmount > userMSUIBalance) {
-      alert('Insufficient MSUI balance');
+      alert("Insufficient MSUI balance");
       return;
     }
 
@@ -42,10 +44,10 @@ export const YieldQuest: React.FC<YieldQuestProps> = ({ onClose, userMSUIBalance
 
     if (result.success) {
       // Success is handled by victory screen
-      console.log('Deposit successful!', result);
+      console.log("Deposit successful!", result);
     } else {
       // Error is handled by defeat screen
-      console.error('Deposit failed:', result.error);
+      console.error("Deposit failed:", result.error);
     }
   };
 
@@ -102,11 +104,16 @@ export const YieldQuest: React.FC<YieldQuestProps> = ({ onClose, userMSUIBalance
                 <TrendingUp className="w-5 h-5 text-gold-500" />
                 <span className="text-gray-300 font-medium">Current APY</span>
               </div>
-              <div className="text-2xl font-bold text-gold-400">{formatAPY(CURRENT_APY)}</div>
+              <div className="text-2xl font-bold text-gold-400">
+                {formatAPY(CURRENT_APY)}
+              </div>
             </div>
             <div className="mt-2 flex items-start gap-2 text-xs text-gray-400">
               <Info className="w-4 h-4 flex-shrink-0 mt-0.5" />
-              <span>Annual Percentage Yield. Your deposit earns interest continuously.</span>
+              <span>
+                Annual Percentage Yield. Your deposit earns interest
+                continuously.
+              </span>
             </div>
           </motion.div>
 
@@ -117,7 +124,9 @@ export const YieldQuest: React.FC<YieldQuestProps> = ({ onClose, userMSUIBalance
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.2 }}
           >
-            <label className="block text-sm font-semibold text-gray-300">Deposit Amount</label>
+            <label className="block text-sm font-semibold text-gray-300">
+              Deposit Amount
+            </label>
             <div className="relative">
               <input
                 type="number"
@@ -135,7 +144,10 @@ export const YieldQuest: React.FC<YieldQuestProps> = ({ onClose, userMSUIBalance
             </div>
             <div className="flex items-center justify-between text-sm">
               <span className="text-gray-400">
-                Balance: <span className="text-gold-400 font-semibold">{userMSUIBalance.toFixed(2)} MSUI</span>
+                Balance:{" "}
+                <span className="text-gold-400 font-semibold">
+                  {userMSUIBalance.toFixed(2)} MSUI
+                </span>
               </span>
               <button
                 onClick={setMaxAmount}
@@ -152,12 +164,14 @@ export const YieldQuest: React.FC<YieldQuestProps> = ({ onClose, userMSUIBalance
             <motion.div
               className="space-y-3 p-4 rounded-xl bg-dark-900 border border-gold-500/20"
               initial={{ opacity: 0, height: 0 }}
-              animate={{ opacity: 1, height: 'auto' }}
+              animate={{ opacity: 1, height: "auto" }}
               transition={{ duration: 0.3 }}
             >
               <div className="flex items-center gap-2 mb-3">
                 <Coins className="w-5 h-5 text-gold-500" />
-                <span className="text-gray-300 font-semibold">Expected Earnings</span>
+                <span className="text-gray-300 font-semibold">
+                  Expected Earnings
+                </span>
               </div>
 
               <div className="grid grid-cols-3 gap-3">
@@ -199,10 +213,23 @@ export const YieldQuest: React.FC<YieldQuestProps> = ({ onClose, userMSUIBalance
               <Info className="w-5 h-5 text-purple-400 flex-shrink-0 mt-0.5" />
               <div className="text-sm text-gray-300 space-y-2">
                 <p>
-                  <span className="font-semibold text-purple-400">How it works:</span> Your MSUI tokens are deposited into the lending vault where they earn continuous interest.
+                  <span className="font-semibold text-purple-400">
+                    How it works:
+                  </span>{" "}
+                  Your MSUI tokens are deposited into the lending vault where
+                  they earn continuous interest.
                 </p>
-                <p>You'll receive a <span className="text-gold-400 font-semibold">Vault Receipt NFT</span> that represents your deposit and accrued earnings.</p>
-                <p>You can withdraw your deposit + earnings anytime by using your receipt.</p>
+                <p>
+                  You&apos;ll receive a{" "}
+                  <span className="text-gold-400 font-semibold">
+                    Vault Receipt NFT
+                  </span>{" "}
+                  that represents your deposit and accrued earnings.
+                </p>
+                <p>
+                  You can withdraw your deposit + earnings anytime by using your
+                  receipt.
+                </p>
               </div>
             </div>
           </motion.div>
@@ -219,7 +246,12 @@ export const YieldQuest: React.FC<YieldQuestProps> = ({ onClose, userMSUIBalance
           </button>
           <motion.button
             onClick={handleStartQuest}
-            disabled={isProcessing || !depositAmount || numericAmount <= 0 || numericAmount > userMSUIBalance}
+            disabled={
+              isProcessing ||
+              !depositAmount ||
+              numericAmount <= 0 ||
+              numericAmount > userMSUIBalance
+            }
             className="flex-1 px-6 py-3 rounded-xl bg-gradient-to-r from-gold-500 to-gold-600 text-dark-900 font-bold flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed hover:shadow-gold-lg transition-all"
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.98 }}
@@ -229,7 +261,7 @@ export const YieldQuest: React.FC<YieldQuestProps> = ({ onClose, userMSUIBalance
                 <motion.div
                   className="w-5 h-5 border-2 border-dark-900 border-t-transparent rounded-full"
                   animate={{ rotate: 360 }}
-                  transition={{ duration: 1, repeat: Infinity, ease: 'linear' }}
+                  transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
                 />
                 Processing...
               </>

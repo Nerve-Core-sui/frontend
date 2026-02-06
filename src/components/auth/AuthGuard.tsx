@@ -1,8 +1,11 @@
 'use client';
 
 import React from 'react';
+import { motion } from 'framer-motion';
+import { Loader2, LogIn } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
-import { LoginButton } from './LoginButton';
+import { Button } from '@/components/ui/Button';
+import { Card } from '@/components/ui/Card';
 
 interface AuthGuardProps {
   children: React.ReactNode;
@@ -15,16 +18,25 @@ export function AuthGuard({
   fallback,
   loadingFallback,
 }: AuthGuardProps) {
-  const { isAuthenticated, isLoading } = useAuth();
+  const { isAuthenticated, isLoading, login } = useAuth();
+
+  const handleLogin = () => {
+    const mockAddress = '0x' + Math.random().toString(16).slice(2, 42);
+    login(mockAddress);
+  };
 
   if (isLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
+      <div className="min-h-[60vh] flex items-center justify-center">
         {loadingFallback || (
-          <div className="flex flex-col items-center gap-4">
-            <div className="w-12 h-12 border-4 border-gray-200 border-t-blue-600 rounded-full animate-spin" />
-            <p className="text-gray-600">Loading...</p>
-          </div>
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            className="flex flex-col items-center gap-4"
+          >
+            <Loader2 size={32} className="text-accent animate-spin" />
+            <p className="text-sm text-text-secondary">Loading...</p>
+          </motion.div>
         )}
       </div>
     );
@@ -32,24 +44,30 @@ export function AuthGuard({
 
   if (!isAuthenticated) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100">
+      <div className="py-8">
         {fallback || (
-          <div className="bg-white p-8 rounded-2xl shadow-xl max-w-md w-full mx-4">
-            <div className="text-center mb-8">
-              <h1 className="text-3xl font-bold text-gray-900 mb-2">
-                Welcome to DeFi Quest
-              </h1>
-              <p className="text-gray-600">
-                Sign in with your Google account to start your journey
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+          >
+            <Card className="p-8 text-center max-w-sm mx-auto">
+              <div className="w-16 h-16 mx-auto mb-6 bg-accent/20 rounded-full flex items-center justify-center">
+                <LogIn size={28} className="text-accent" />
+              </div>
+              <h2 className="text-xl font-bold text-text-primary mb-2">
+                Connect Wallet
+              </h2>
+              <p className="text-sm text-text-secondary mb-6">
+                Connect your wallet to access this feature
               </p>
-            </div>
-            <div className="flex justify-center">
-              <LoginButton />
-            </div>
-            <div className="mt-6 text-center text-sm text-gray-500">
-              <p>Powered by zkLogin on Sui</p>
-            </div>
-          </div>
+              <Button variant="primary" size="lg" onClick={handleLogin}>
+                Connect Wallet
+              </Button>
+              <p className="mt-4 text-xs text-text-muted">
+                Powered by zkLogin on Sui
+              </p>
+            </Card>
+          </motion.div>
         )}
       </div>
     );

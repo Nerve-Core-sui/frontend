@@ -1,8 +1,8 @@
-'use client';
+"use client";
 
-import React, { useState, useMemo, useCallback } from 'react';
-import { clsx } from 'clsx';
-import { motion, AnimatePresence } from 'framer-motion';
+import React, { useState, useMemo, useCallback } from "react";
+import { clsx } from "clsx";
+import { motion, AnimatePresence } from "framer-motion";
 import {
   Zap,
   AlertTriangle,
@@ -14,10 +14,10 @@ import {
   XCircle,
   Loader2,
   Info,
-} from 'lucide-react';
-import { Button } from '@/components/ui/Button';
-import { useLeverageQuest } from '@/hooks/useLeverageQuest';
-import { LEVERAGE_STEPS, COLLATERAL_FACTOR, LEVERAGE_MULTIPLIER } from '@/lib/ptb/leverage';
+} from "lucide-react";
+import { Button } from "@/components/ui/Button";
+import { useLeverageQuest } from "@/hooks/useLeverageQuest";
+import { LEVERAGE_STEPS } from "@/lib/ptb/leverage";
 
 export interface LeverageQuestProps {
   onClose?: () => void;
@@ -28,7 +28,7 @@ export const LeverageQuest: React.FC<LeverageQuestProps> = ({
   onClose,
   onSuccess,
 }) => {
-  const [amount, setAmount] = useState<string>('');
+  const [amount, setAmount] = useState<string>("");
   const [showRiskWarning, setShowRiskWarning] = useState(true);
 
   const {
@@ -48,19 +48,19 @@ export const LeverageQuest: React.FC<LeverageQuestProps> = ({
 
   const leverageInfo = useMemo(
     () => getLeverageInfo(amount),
-    [amount, getLeverageInfo]
+    [amount, getLeverageInfo],
   );
 
   const handleAmountChange = useCallback(
     (e: React.ChangeEvent<HTMLInputElement>) => {
-      const value = e.target.value.replace(/[^0-9.]/g, '');
+      const value = e.target.value.replace(/[^0-9.]/g, "");
       // Prevent multiple decimals
-      const parts = value.split('.');
+      const parts = value.split(".");
       if (parts.length > 2) return;
       if (parts[1] && parts[1].length > 4) return;
       setAmount(value);
     },
-    []
+    [],
   );
 
   const handleExecute = useCallback(async () => {
@@ -79,7 +79,7 @@ export const LeverageQuest: React.FC<LeverageQuestProps> = ({
   }, [amount]);
 
   // Render victory state
-  if (battleState.status === 'victory') {
+  if (battleState.status === "victory") {
     return (
       <div className="space-y-6">
         <motion.div
@@ -149,7 +149,7 @@ export const LeverageQuest: React.FC<LeverageQuestProps> = ({
   }
 
   // Render defeat state
-  if (battleState.status === 'defeat') {
+  if (battleState.status === "defeat") {
     return (
       <div className="space-y-6">
         <motion.div
@@ -162,7 +162,7 @@ export const LeverageQuest: React.FC<LeverageQuestProps> = ({
             Transaction Reverted
           </h3>
           <p className="text-gray-300 mb-4">
-            {battleState.errorMessage || 'An error occurred'}
+            {battleState.errorMessage || "An error occurred"}
           </p>
 
           {/* Safety message */}
@@ -206,8 +206,9 @@ export const LeverageQuest: React.FC<LeverageQuestProps> = ({
         {/* Step Progress */}
         <div className="space-y-3">
           {LEVERAGE_STEPS.map((step, index) => {
-            const isCompleted = index < currentStepIndex ||
-              (battleState.steps[index]?.status === 'completed');
+            const isCompleted =
+              index < currentStepIndex ||
+              battleState.steps[index]?.status === "completed";
             const isActive = index === currentStepIndex;
             const isPending = index > currentStepIndex;
 
@@ -218,21 +219,20 @@ export const LeverageQuest: React.FC<LeverageQuestProps> = ({
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ delay: index * 0.1 }}
                 className={clsx(
-                  'flex items-center gap-4 p-4 rounded-lg border transition-all',
-                  isCompleted &&
-                    'bg-emerald-950/30 border-emerald-500/50',
+                  "flex items-center gap-4 p-4 rounded-lg border transition-all",
+                  isCompleted && "bg-emerald-950/30 border-emerald-500/50",
                   isActive &&
-                    'bg-amber-950/30 border-amber-500/50 shadow-[0_0_15px_rgba(245,158,11,0.2)]',
-                  isPending && 'bg-dark-800/50 border-dark-600/50 opacity-50'
+                    "bg-amber-950/30 border-amber-500/50 shadow-[0_0_15px_rgba(245,158,11,0.2)]",
+                  isPending && "bg-dark-800/50 border-dark-600/50 opacity-50",
                 )}
               >
                 {/* Step Icon */}
                 <div
                   className={clsx(
-                    'w-10 h-10 rounded-full flex items-center justify-center text-xl',
-                    isCompleted && 'bg-emerald-500/20',
-                    isActive && 'bg-amber-500/20',
-                    isPending && 'bg-dark-700'
+                    "w-10 h-10 rounded-full flex items-center justify-center text-xl",
+                    isCompleted && "bg-emerald-500/20",
+                    isActive && "bg-amber-500/20",
+                    isPending && "bg-dark-700",
                   )}
                 >
                   {isCompleted ? (
@@ -251,18 +251,18 @@ export const LeverageQuest: React.FC<LeverageQuestProps> = ({
                 <div className="flex-1">
                   <h4
                     className={clsx(
-                      'font-semibold',
-                      isCompleted && 'text-emerald-400',
-                      isActive && 'text-amber-400',
-                      isPending && 'text-gray-500'
+                      "font-semibold",
+                      isCompleted && "text-emerald-400",
+                      isActive && "text-amber-400",
+                      isPending && "text-gray-500",
                     )}
                   >
                     Step {index + 1}: {step.name}
                   </h4>
                   <p
                     className={clsx(
-                      'text-sm',
-                      isActive ? 'text-gray-300' : 'text-gray-500'
+                      "text-sm",
+                      isActive ? "text-gray-300" : "text-gray-500",
                     )}
                   >
                     {step.description}
@@ -288,7 +288,7 @@ export const LeverageQuest: React.FC<LeverageQuestProps> = ({
         <div className="w-full h-2 bg-dark-700 rounded-full overflow-hidden">
           <motion.div
             className="h-full bg-gradient-to-r from-purple-500 via-gold-500 to-emerald-500"
-            initial={{ width: '0%' }}
+            initial={{ width: "0%" }}
             animate={{
               width: `${((currentStepIndex + 1) / LEVERAGE_STEPS.length) * 100}%`,
             }}
@@ -321,12 +321,15 @@ export const LeverageQuest: React.FC<LeverageQuestProps> = ({
         {showRiskWarning && (
           <motion.div
             initial={{ opacity: 0, height: 0 }}
-            animate={{ opacity: 1, height: 'auto' }}
+            animate={{ opacity: 1, height: "auto" }}
             exit={{ opacity: 0, height: 0 }}
             className="bg-amber-950/30 rounded-xl p-4 border border-amber-500/30"
           >
             <div className="flex items-start gap-3">
-              <AlertTriangle className="text-amber-400 flex-shrink-0 mt-0.5" size={20} />
+              <AlertTriangle
+                className="text-amber-400 flex-shrink-0 mt-0.5"
+                size={20}
+              />
               <div className="flex-1">
                 <h4 className="text-amber-400 font-semibold mb-1">
                   Advanced Strategy
@@ -359,11 +362,11 @@ export const LeverageQuest: React.FC<LeverageQuestProps> = ({
             onChange={handleAmountChange}
             placeholder="Enter amount..."
             className={clsx(
-              'w-full px-4 py-3 pr-20 rounded-lg',
-              'bg-dark-800 border-2 border-dark-600',
-              'text-white placeholder-gray-500',
-              'focus:outline-none focus:border-gold-500/50',
-              'transition-colors'
+              "w-full px-4 py-3 pr-20 rounded-lg",
+              "bg-dark-800 border-2 border-dark-600",
+              "text-white placeholder-gray-500",
+              "focus:outline-none focus:border-gold-500/50",
+              "transition-colors",
             )}
           />
           <div className="absolute right-3 top-1/2 -translate-y-1/2">
@@ -448,7 +451,7 @@ export const LeverageQuest: React.FC<LeverageQuestProps> = ({
           Transaction Steps (All Atomic)
         </h4>
         <div className="grid grid-cols-2 gap-2">
-          {LEVERAGE_STEPS.map((step, index) => (
+          {LEVERAGE_STEPS.map((step) => (
             <div
               key={step.id}
               className="flex items-center gap-2 p-2 rounded bg-dark-800/50 border border-dark-600/50"
@@ -467,12 +470,10 @@ export const LeverageQuest: React.FC<LeverageQuestProps> = ({
             <Coins className="text-purple-400" size={24} />
           </div>
           <div>
-            <h4 className="text-purple-400 font-semibold">
-              Sui PTB Magic
-            </h4>
+            <h4 className="text-purple-400 font-semibold">Sui PTB Magic</h4>
             <p className="text-xs text-gray-400">
-              If ANY step fails, the ENTIRE transaction reverts atomically.
-              Your funds are always safe!
+              If ANY step fails, the ENTIRE transaction reverts atomically. Your
+              funds are always safe!
             </p>
           </div>
         </div>
@@ -489,7 +490,6 @@ export const LeverageQuest: React.FC<LeverageQuestProps> = ({
       <Button
         variant="primary"
         size="lg"
-        glow
         className="w-full"
         disabled={!isValidAmount || isExecuting}
         onClick={handleExecute}

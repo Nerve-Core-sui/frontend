@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useCallback, useMemo } from 'react';
+import { useState, useCallback } from 'react';
 import { useBattle } from '@/hooks/useBattle';
 import { useAuth } from '@/contexts/AuthContext';
 import {
@@ -114,6 +114,8 @@ export function useLeverageQuest(options: UseLeverageQuestOptions = {}) {
       try {
         // Build the PTB transaction
         // In a real implementation, we'd use the actual coin ID
+        // Note: tx is prepared but not executed in this mock implementation
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
         const tx = msuiCoinId
           ? buildLeverageTransaction(msuiCoinId, amount)
           : buildLeverageTransactionWithSplit(

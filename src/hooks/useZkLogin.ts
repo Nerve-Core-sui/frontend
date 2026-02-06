@@ -46,8 +46,8 @@ export function useZkLogin() {
       const maxEpoch = await getMaxEpoch();
 
       // Create nonce
-      const publicKeyBytes = keypair.getPublicKey().toBytes();
-      const nonce = createNonce(publicKeyBytes, maxEpoch, randomness);
+      const publicKey = keypair.getPublicKey();
+      const nonce = createNonce(publicKey, maxEpoch, randomness);
 
       // Store temporary data for callback
       const serialized = serializeKeypair(keypair);
@@ -107,7 +107,7 @@ export function useZkLogin() {
 
       // Deserialize keypair
       const keypair = deserializeKeypair(JSON.parse(serializedKeypair));
-      const publicKeyBase64 = Buffer.from(keypair.getPublicKey().toBytes()).toString('base64');
+      const publicKeyBase64 = Buffer.from(keypair.getPublicKey().toRawBytes()).toString('base64');
 
       // Generate zkLogin proof
       const zkProof = await generateZkProof({

@@ -144,7 +144,7 @@ export const DefeatScreen: React.FC<DefeatScreenProps> = ({
             animate={{ opacity: 1 }}
             transition={{ delay: 1.3 }}
           >
-            "Every hero faces defeat. It's rising again that defines greatness."
+            Every hero faces defeat. Rising again is what defines greatness.
           </motion.p>
         </div>
       </motion.div>

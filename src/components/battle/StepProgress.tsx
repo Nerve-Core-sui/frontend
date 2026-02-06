@@ -11,7 +11,7 @@ export interface StepProgressProps {
 }
 
 export const StepProgress: React.FC<StepProgressProps> = ({ steps, currentStep }) => {
-  const getStepIcon = (step: BattleStep, index: number) => {
+  const getStepIcon = (step: BattleStep) => {
     switch (step.status) {
       case 'completed':
         return <CheckCircle2 className="w-6 h-6" />;
@@ -83,7 +83,7 @@ export const StepProgress: React.FC<StepProgressProps> = ({ steps, currentStep }
                 repeat: index === currentStep ? Infinity : 0,
               }}
             >
-              {getStepIcon(step, index)}
+              {getStepIcon(step)}
 
               {/* Attack burst effect */}
               {step.status === 'in-progress' && (

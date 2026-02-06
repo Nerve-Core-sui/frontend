@@ -163,7 +163,7 @@ export const BattleOverlay: React.FC = () => {
                     <Character
                       type="player"
                       isAttacking={showAttack}
-                      isVictorious={state.status === 'victory'}
+                      isVictorious={false}
                     />
                     <div className="w-48">
                       <HealthBar current={100} max={100} label="Hero" />

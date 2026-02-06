@@ -52,7 +52,7 @@ export const BattleProvider: React.FC<{ children: ReactNode }> = ({ children }) 
     });
   }, []);
 
-  const setVictory = useCallback((reward?: string) => {
+  const setVictory = useCallback(() => {
     setState((prev) => ({
       ...prev,
       status: 'victory',

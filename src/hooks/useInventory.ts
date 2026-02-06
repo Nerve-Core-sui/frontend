@@ -6,7 +6,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { SuiClient } from '@mysten/sui.js/client';
 import { useAuth } from '@/contexts/AuthContext';
 import { InventoryData, InventoryItem, ItemRarity, TokenItem, PositionItem } from '@/types/inventory';
-import { formatTokenAmount, PACKAGE_ID } from '@/lib/contracts';
+import { formatTokenAmount } from '@/lib/contracts';
 
 const RPC_URL = process.env.NEXT_PUBLIC_SUI_RPC_URL || 'https://fullnode.testnet.sui.io:443';
 
@@ -74,7 +74,8 @@ export function useInventory() {
 
         // Check if it's a token (MSUI or MUSDC)
         if (objectType.includes('::msui::MSUI') && content && 'fields' in content) {
-          const balance = content.fields?.balance || '0';
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          const balance = (content.fields as any)?.balance || '0';
           const balanceFormatted = formatTokenAmount(balance);
           const usdValue = parseFloat(balanceFormatted) * MOCK_PRICES.MSUI;
 
@@ -93,7 +94,8 @@ export function useInventory() {
           items.push(tokenItem);
           totalValue += usdValue;
         } else if (objectType.includes('::musdc::MUSDC') && content && 'fields' in content) {
-          const balance = content.fields?.balance || '0';
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          const balance = (content.fields as any)?.balance || '0';
           const balanceFormatted = formatTokenAmount(balance);
           const usdValue = parseFloat(balanceFormatted) * MOCK_PRICES.MUSDC;
 
@@ -114,6 +116,7 @@ export function useInventory() {
         }
         // Check if it's a lending position receipt
         else if (objectType.includes('::lending::LendingReceipt') && content && 'fields' in content) {
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
           const fields = content.fields as any;
           const depositAmount = fields.deposit_amount || '0';
           const borrowedAmount = fields.borrowed_amount || '0';

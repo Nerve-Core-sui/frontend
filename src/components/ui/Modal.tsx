@@ -1,16 +1,15 @@
 'use client';
 
-import React, { useEffect } from 'react';
-import { clsx } from 'clsx';
-import { X } from 'lucide-react';
+import React, { useEffect, useCallback } from 'react';
+import { motion, AnimatePresence, PanInfo } from 'framer-motion';
 
 export interface ModalProps {
   isOpen: boolean;
   onClose: () => void;
   title?: string;
   children: React.ReactNode;
-  size?: 'sm' | 'md' | 'lg' | 'xl';
   showCloseButton?: boolean;
+  showDragHandle?: boolean;
 }
 
 export const Modal: React.FC<ModalProps> = ({
@@ -18,100 +17,107 @@ export const Modal: React.FC<ModalProps> = ({
   onClose,
   title,
   children,
-  size = 'md',
   showCloseButton = true,
+  showDragHandle = true,
 }) => {
+  // Lock body scroll when modal is open
   useEffect(() => {
     if (isOpen) {
       document.body.style.overflow = 'hidden';
     } else {
       document.body.style.overflow = 'unset';
     }
-
     return () => {
       document.body.style.overflow = 'unset';
     };
   }, [isOpen]);
 
+  // Handle escape key
   useEffect(() => {
     const handleEscape = (e: KeyboardEvent) => {
       if (e.key === 'Escape' && isOpen) {
         onClose();
       }
     };
-
     window.addEventListener('keydown', handleEscape);
     return () => window.removeEventListener('keydown', handleEscape);
   }, [isOpen, onClose]);
 
-  if (!isOpen) return null;
-
-  const sizes = {
-    sm: 'max-w-md',
-    md: 'max-w-2xl',
-    lg: 'max-w-4xl',
-    xl: 'max-w-6xl',
-  };
+  // Handle drag to dismiss
+  const handleDragEnd = useCallback(
+    (_: MouseEvent | TouchEvent | PointerEvent, info: PanInfo) => {
+      if (info.offset.y > 100 || info.velocity.y > 500) {
+        onClose();
+      }
+    },
+    [onClose]
+  );
 
   return (
-    <>
-      {/* Backdrop */}
-      <div
-        className="modal-backdrop"
-        onClick={onClose}
-        aria-hidden="true"
-      />
+    <AnimatePresence>
+      {isOpen && (
+        <>
+          {/* Backdrop */}
+          <motion.div
+            className="fixed inset-0 z-50 bg-black/70"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            onClick={onClose}
+          />
 
-      {/* Modal */}
-      <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-        <div
-          className={clsx(
-            'relative w-full',
-            'card-fantasy p-0 overflow-hidden',
-            'animate-[slideIn_0.3s_ease-out]',
-            sizes[size]
-          )}
-          onClick={(e) => e.stopPropagation()}
-        >
-          {/* Header */}
-          {(title || showCloseButton) && (
-            <div className="flex items-center justify-between px-6 py-4 border-b border-gold-500/20">
-              {title && (
-                <h2 className="text-2xl font-fantasy text-gold-500 text-glow-gold">
-                  {title}
-                </h2>
+          {/* Bottom Sheet Modal */}
+          <motion.div
+            className="fixed inset-x-0 bottom-0 z-50 max-h-[90vh] overflow-hidden"
+            initial={{ y: '100%' }}
+            animate={{ y: 0 }}
+            exit={{ y: '100%' }}
+            transition={{ type: 'spring', damping: 30, stiffness: 300 }}
+            drag="y"
+            dragConstraints={{ top: 0 }}
+            dragElastic={0.2}
+            onDragEnd={handleDragEnd}
+          >
+            <div className="bg-surface border-t-4 border-l-2 border-r-2 border-border">
+              {/* Drag Handle */}
+              {showDragHandle && (
+                <div className="flex justify-center pt-4 pb-2">
+                  <div className="w-12 h-1 bg-border" style={{ borderRadius: 0 }} />
+                </div>
               )}
-              {showCloseButton && (
-                <button
-                  onClick={onClose}
-                  className="text-gray-400 hover:text-gold-500 transition-colors p-1 rounded hover:bg-dark-700"
-                  aria-label="Close modal"
-                >
-                  <X size={24} />
-                </button>
+
+              {/* Header */}
+              {(title || showCloseButton) && (
+                <div className="flex items-center justify-between px-6 py-3 border-b-2 border-border">
+                  {title && (
+                    <h2 className="font-pixel text-sm text-pixel-gold uppercase">
+                      {title}
+                    </h2>
+                  )}
+                  {showCloseButton && (
+                    <button
+                      onClick={onClose}
+                      className="p-2 -mr-2 text-text-muted hover:text-text-primary bg-surface-elevated border-2 border-border hover:border-pixel-gold transition-colors"
+                      style={{ borderRadius: '4px' }}
+                      aria-label="Close"
+                    >
+                      <span className="text-lg leading-none">✕</span>
+                    </button>
+                  )}
+                </div>
               )}
+
+              {/* Content */}
+              <div className="px-6 pb-8 max-h-[70vh] overflow-y-auto hide-scrollbar">
+                {children}
+              </div>
+
+              {/* Safe area spacer */}
+              <div className="h-safe-bottom bg-surface" />
             </div>
-          )}
-
-          {/* Content */}
-          <div className="px-6 py-6 max-h-[70vh] overflow-y-auto">
-            {children}
-          </div>
-        </div>
-      </div>
-
-      <style jsx>{`
-        @keyframes slideIn {
-          from {
-            opacity: 0;
-            transform: translateY(-20px) scale(0.95);
-          }
-          to {
-            opacity: 1;
-            transform: translateY(0) scale(1);
-          }
-        }
-      `}</style>
-    </>
+          </motion.div>
+        </>
+      )}
+    </AnimatePresence>
   );
 };

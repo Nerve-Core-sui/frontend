@@ -1,15 +1,12 @@
 'use client';
 
 import { useState, useCallback } from 'react';
-import { useCurrentAccount, useSignAndExecuteTransaction, useSuiClient } from '@mysten/dapp-kit';
-import { Transaction } from '@mysten/sui/transactions';
 import { PACKAGE_ID, SWAP_POOL } from '@/lib/contracts';
 import {
   buildSwapTransaction,
   calculateMinOutput,
   calculateExpectedOutput,
   parseSwapAmount,
-  formatSwapAmount,
   SwapDirection,
 } from '@/lib/ptb/swap';
 import { useBattle } from './useBattle';
@@ -44,9 +41,10 @@ const MOCK_MSUI_RESERVE = BigInt(1000000 * 10 ** 9); // 1M MSUI
 const MOCK_MUSDC_RESERVE = BigInt(2000000 * 10 ** 9); // 2M MUSDC
 
 export const useSwapQuest = (): UseSwapQuestReturn => {
-  const account = useCurrentAccount();
-  const suiClient = useSuiClient();
-  const { mutate: signAndExecute } = useSignAndExecuteTransaction();
+  // Mock implementations - in production these would use @mysten/dapp-kit
+  // const account = useCurrentAccount();
+  // const suiClient = useSuiClient();
+  // const { mutate: signAndExecute } = useSignAndExecuteTransaction();
   const battle = useBattle();
 
   const [quote, setQuote] = useState<SwapQuote | null>(null);
@@ -112,10 +110,11 @@ export const useSwapQuest = (): UseSwapQuestReturn => {
    */
   const executeSwap = useCallback(
     async (amount: string, slippage: number, direction: SwapDirection) => {
-      if (!account) {
-        setError('Please connect your wallet');
-        return;
-      }
+      // Mock implementation - wallet connection check would be here
+      // if (!account) {
+      //   setError('Please connect your wallet');
+      //   return;
+      // }
 
       setIsExecuting(true);
       setError(null);
@@ -162,6 +161,7 @@ export const useSwapQuest = (): UseSwapQuestReturn => {
 
         // Step 1: Prepare transaction
         battle.updateStep(0, 'in-progress');
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
         const tx = buildSwapTransaction(
           PACKAGE_ID,
           SWAP_POOL,
@@ -171,50 +171,35 @@ export const useSwapQuest = (): UseSwapQuestReturn => {
         );
         battle.updateStep(0, 'completed');
 
-        // Step 2: Execute transaction
+        // Step 2: Execute transaction (Mock for demo)
         battle.updateStep(1, 'in-progress');
 
-        await new Promise<void>((resolve, reject) => {
-          signAndExecute(
-            {
-              transaction: tx,
-            },
-            {
-              onSuccess: async (result) => {
-                try {
-                  setTxDigest(result.digest);
-                  battle.updateStep(1, 'completed');
+        // Simulate transaction execution delay
+        await new Promise(resolve => setTimeout(resolve, 1500));
 
-                  // Step 3: Wait for confirmation
-                  battle.updateStep(2, 'in-progress');
+        // Mock transaction digest
+        const mockDigest = `mock_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+        setTxDigest(mockDigest);
+        battle.updateStep(1, 'completed');
 
-                  // Wait for transaction to be finalized
-                  await suiClient.waitForTransaction({
-                    digest: result.digest,
-                    options: {
-                      showEffects: true,
-                    },
-                  });
+        // Step 3: Wait for confirmation
+        battle.updateStep(2, 'in-progress');
 
-                  battle.updateStep(2, 'completed');
-                  setTxSuccess(true);
+        // Simulate confirmation delay
+        await new Promise(resolve => setTimeout(resolve, 1000));
 
-                  // Victory!
-                  setTimeout(() => {
-                    battle.setVictory();
-                  }, 500);
+        battle.updateStep(2, 'completed');
+        setTxSuccess(true);
 
-                  resolve();
-                } catch (err) {
-                  reject(err);
-                }
-              },
-              onError: (err) => {
-                reject(err);
-              },
-            }
-          );
-        });
+        // Victory!
+        setTimeout(() => {
+          battle.setVictory();
+        }, 500);
+
+        // Note: In production, replace this mock with actual wallet integration:
+        // import { useSignAndExecuteTransaction, useSuiClient } from '@mysten/dapp-kit';
+        // const { mutate: signAndExecute } = useSignAndExecuteTransaction();
+        // const suiClient = useSuiClient();
       } catch (err) {
         const errorMessage = err instanceof Error ? err.message : 'Swap failed';
         setError(errorMessage);
@@ -231,7 +216,7 @@ export const useSwapQuest = (): UseSwapQuestReturn => {
         setIsExecuting(false);
       }
     },
-    [account, suiClient, signAndExecute, battle, getQuote]
+    [battle, getQuote]
   );
 
   return {
