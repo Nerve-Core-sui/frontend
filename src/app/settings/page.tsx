@@ -19,12 +19,9 @@ interface SettingsGroup {
 }
 
 export default function SettingsPage() {
-  const { user, isAuthenticated, logout, login } = useAuth();
+  const { user, isAuthenticated, logout } = useAuth();
 
-  const handleLogin = () => {
-    const mockAddress = '0x' + Math.random().toString(16).slice(2, 42);
-    login(mockAddress);
-  };
+  // Login is handled via zkLogin on the home page
 
   const settingsGroups: SettingsGroup[] = [
     {
@@ -98,9 +95,9 @@ export default function SettingsPage() {
               <p className="text-sm text-text-secondary mb-4">
                 Connect your wallet to access all features
               </p>
-              <Button variant="primary" size="md" onClick={handleLogin}>
-                Connect Wallet
-              </Button>
+              <a href="/" className="text-accent hover:underline text-sm">
+                Go to Home to connect
+              </a>
             </div>
           )}
         </Card>

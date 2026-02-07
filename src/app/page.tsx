@@ -4,7 +4,6 @@ import { useRouter } from 'next/navigation';
 import { useAuth } from '@/contexts/AuthContext';
 import { useZkLogin } from '@/hooks/useZkLogin';
 import { motion } from 'framer-motion';
-import { QUESTS } from '@/lib/quests';
 
 const stagger = {
   hidden: {},
@@ -26,20 +25,35 @@ export default function HomePage() {
   };
 
   const quickActions = [
-    { icon: '⇄', label: 'Swap', color: '#eab308', bg: 'rgba(234,179,8,0.12)', href: '/quests' },
-    { icon: '↓', label: 'Deposit', color: '#84cc16', bg: 'rgba(132,204,22,0.12)', href: '/quests' },
-    { icon: '⚡', label: 'Boost', color: '#a855f7', bg: 'rgba(168,85,247,0.12)', href: '/quests' },
-    { icon: '💧', label: 'Faucet', color: '#6dc2f2', bg: 'rgba(109,194,242,0.12)', href: '/faucet' },
+    { icon: '⇄', label: 'Swap', color: '#eab308', bg: 'rgba(234,179,8,0.12)', href: '/swap' },
+    { icon: '↓', label: 'Lend', color: '#84cc16', bg: 'rgba(132,204,22,0.12)', href: '/lending' },
+    { icon: '⚔', label: 'Quests', color: '#f97316', bg: 'rgba(249,115,22,0.12)', href: '/quests' },
+    { icon: '◈', label: 'Inventory', color: '#a855f7', bg: 'rgba(168,85,247,0.12)', href: '/wallet' },
   ];
 
-  // Pick first 3 quests for featured section
-  const featured = QUESTS.slice(0, 3);
-
-  const difficultyColor: Record<string, string> = {
-    beginner: 'text-pixel-lime bg-pixel-lime/10 border-pixel-lime',
-    intermediate: 'text-pixel-gold bg-pixel-gold/10 border-pixel-gold',
-    advanced: 'text-pixel-red bg-pixel-red/10 border-pixel-red',
-  };
+  const features = [
+    {
+      icon: '⇄',
+      title: 'Token Swap',
+      desc: 'Exchange MSUI and MUSDC instantly via on-chain AMM',
+      href: '/swap',
+      color: '#eab308',
+    },
+    {
+      icon: '🏦',
+      title: 'Lending & Borrowing',
+      desc: 'Deposit MSUI, borrow up to 80% LTV in MUSDC',
+      href: '/lending',
+      color: '#84cc16',
+    },
+    {
+      icon: '💧',
+      title: 'Token Faucet',
+      desc: 'Get free testnet SUI, MSUI, and MUSDC tokens',
+      href: '/faucet',
+      color: '#6dc2f2',
+    },
+  ];
 
   return (
     <motion.div
@@ -81,9 +95,9 @@ export default function HomePage() {
               </div>
               <div className="flex items-center gap-2 mt-2">
                 <div className="inline-flex items-center gap-1 px-2 py-0.5 bg-pixel-lime/10 border-2 border-pixel-lime">
-                  <span className="font-pixel text-[9px] text-pixel-lime">▲ +2.4%</span>
+                  <span className="font-pixel text-[9px] text-pixel-lime">TESTNET</span>
                 </div>
-                <span className="font-pixel text-[8px] text-text-muted">24H</span>
+                <span className="font-pixel text-[8px] text-text-muted">LIVE</span>
               </div>
             </>
           ) : (
@@ -153,68 +167,43 @@ export default function HomePage() {
         </div>
       </motion.div>
 
-      {/* ── Featured Quests ── */}
+      {/* ── Features ── */}
       <motion.div variants={fadeUp}>
-        <h3 className="section-header px-1">Featured Quests</h3>
+        <h3 className="section-header px-1">DeFi Features</h3>
         <div className="space-y-3">
-          {featured.map((quest) => {
-            const dc = difficultyColor[quest.difficulty] || difficultyColor.beginner;
-            const apyMap: Record<string, string> = {
-              swap: '~0.5%',
-              yield: '~8.2%',
-              leverage: '~15%',
-            };
-
-            return (
-              <motion.div
-                key={quest.id}
-                variants={fadeUp}
-                onClick={() => router.push('/quests')}
-                className="card-interactive cursor-pointer"
-              >
-                <div className="flex items-center gap-3">
-                  {/* Quest Icon */}
-                  <div
-                    className="w-12 h-12 flex-shrink-0 flex items-center justify-center text-2xl border-2 border-border bg-surface-deep"
-                    style={{
-                      boxShadow: 'inset 2px 2px 0 0 rgba(0,0,0,0.2)',
-                    }}
-                  >
-                    {quest.icon}
-                  </div>
-
-                  {/* Quest Info */}
-                  <div className="flex-1 min-w-0">
-                    <h4 className="font-pixel text-[10px] text-text-primary uppercase tracking-wide truncate">
-                      {quest.id === 'leverage' ? 'Boost Quest' : quest.title}
-                    </h4>
-                    <div className="flex items-center gap-2 mt-1.5">
-                      <span className={`inline-flex items-center px-1.5 py-0 font-pixel text-[8px] uppercase border ${dc}`}>
-                        {quest.difficulty}
-                      </span>
-                      <span className="font-pixel text-[8px] text-text-muted">
-                        {quest.steps.length} steps
-                      </span>
-                    </div>
-                  </div>
-
-                  {/* APY Badge */}
-                  <div className="flex-shrink-0 flex flex-col items-end gap-1">
-                    <span
-                      className="font-pixel text-[11px] text-pixel-lime"
-                      style={{ textShadow: '0 0 6px rgba(132,204,22,0.3)' }}
-                    >
-                      {apyMap[quest.id] || '~5%'}
-                    </span>
-                    <span className="font-pixel text-[7px] text-text-muted uppercase">APY</span>
-                  </div>
-
-                  {/* Chevron */}
-                  <span className="text-lg text-text-muted ml-1">›</span>
+          {features.map((feat) => (
+            <motion.div
+              key={feat.title}
+              variants={fadeUp}
+              onClick={() => router.push(feat.href)}
+              className="card-interactive cursor-pointer"
+            >
+              <div className="flex items-center gap-3">
+                {/* Icon */}
+                <div
+                  className="w-12 h-12 flex-shrink-0 flex items-center justify-center text-2xl border-2 border-border bg-surface-deep"
+                  style={{
+                    boxShadow: 'inset 2px 2px 0 0 rgba(0,0,0,0.2)',
+                  }}
+                >
+                  {feat.icon}
                 </div>
-              </motion.div>
-            );
-          })}
+
+                {/* Info */}
+                <div className="flex-1 min-w-0">
+                  <h4 className="font-pixel text-[10px] text-text-primary uppercase tracking-wide truncate">
+                    {feat.title}
+                  </h4>
+                  <p className="text-xs text-text-muted mt-1 line-clamp-1">
+                    {feat.desc}
+                  </p>
+                </div>
+
+                {/* Chevron */}
+                <span className="text-lg text-text-muted ml-1">›</span>
+              </div>
+            </motion.div>
+          ))}
         </div>
       </motion.div>
 

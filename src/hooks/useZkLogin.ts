@@ -14,7 +14,9 @@ import {
   serializeKeypair,
   deserializeKeypair,
   deriveZkLoginAddress,
+  deriveAddressFromSeed,
   getExtendedEphemeralPubKey,
+  computeAddressSeed,
   ZK_LOGIN_SALT,
 } from '@/lib/zklogin/utils';
 import { generateZkProof } from '@/lib/zklogin/prover';
@@ -105,25 +107,40 @@ export function useZkLogin() {
       }
 
       // Decode JWT to get user info
-      decodeJwt(jwt);
+      const decodedJwt = decodeJwt(jwt);
 
       // Deserialize keypair and get extended ephemeral public key
       const keypair = deserializeKeypair(JSON.parse(serializedKeypair));
       const extendedEphemeralPublicKey = getExtendedEphemeralPubKey(keypair);
 
-      // Generate zkLogin proof
-      const zkProof = await generateZkProof({
-        jwt,
-        ephemeralPublicKey: extendedEphemeralPublicKey,
-        maxEpoch: parseInt(maxEpoch, 10),
-        randomness,
-        salt: ZK_LOGIN_SALT,
-      });
+      // Try to generate zkLogin proof (prover may be down)
+      let zkProof = null;
+      try {
+        zkProof = await generateZkProof({
+          jwt,
+          ephemeralPublicKey: extendedEphemeralPublicKey,
+          maxEpoch: parseInt(maxEpoch, 10),
+          randomness,
+          salt: ZK_LOGIN_SALT,
+        });
+        console.log('ZK proof generated, addressSeed:', zkProof.addressSeed ? 'present' : 'absent');
+      } catch (proverErr) {
+        console.warn('ZK proof generation failed (prover may be down). Login will proceed without proof.', proverErr);
+      }
 
-      // Derive Sui address using real jwtToAddress
-      const address = deriveZkLoginAddress(jwt, ZK_LOGIN_SALT);
+      // Derive Sui address:
+      // - If Enoki returned addressSeed, use it (consistent with the proof)
+      // - Otherwise fall back to local derivation with hardcoded salt
+      let address: string;
+      if (zkProof?.addressSeed) {
+        address = deriveAddressFromSeed(zkProof.addressSeed, decodedJwt.iss);
+        console.log('Address derived from Enoki addressSeed:', address);
+      } else {
+        address = deriveZkLoginAddress(jwt, ZK_LOGIN_SALT);
+        console.log('Address derived from local salt (fallback):', address);
+      }
 
-      // Create session
+      // Create session (with or without proof)
       const newSession: AuthSession = {
         address,
         ephemeralKeyPair: JSON.parse(serializedKeypair),
@@ -153,11 +170,13 @@ export function useZkLogin() {
       setError(message);
       setIsProcessing(false);
 
-      // Clean up on error
-      sessionStorage.removeItem(TEMP_KEYPAIR_KEY);
-      sessionStorage.removeItem(TEMP_NONCE_KEY);
-      sessionStorage.removeItem(TEMP_RANDOMNESS_KEY);
-      sessionStorage.removeItem(TEMP_MAX_EPOCH_KEY);
+      // Clean up on non-retryable errors
+      if (message.includes('Nonce mismatch') || message.includes('Missing temporary')) {
+        sessionStorage.removeItem(TEMP_KEYPAIR_KEY);
+        sessionStorage.removeItem(TEMP_NONCE_KEY);
+        sessionStorage.removeItem(TEMP_RANDOMNESS_KEY);
+        sessionStorage.removeItem(TEMP_MAX_EPOCH_KEY);
+      }
 
       throw err;
     }
@@ -197,10 +216,13 @@ export function useZkLogin() {
       const { signature: ephemeralSignature } = await keypair.signTransaction(txBytes);
 
       // Combine with ZK proof to create zkLogin signature
+      // Prefer addressSeed from prover response (Enoki returns it), fall back to local computation
+      const addressSeed = session.zkProof.addressSeed || computeAddressSeed(session.jwt, ZK_LOGIN_SALT);
+      console.log('signTransaction addressSeed:', addressSeed.slice(0, 20) + '...', session.zkProof.addressSeed ? '(from prover)' : '(locally computed)');
       const zkLoginSignature = getZkLoginSignature({
         inputs: {
           ...session.zkProof,
-          addressSeed: ZK_LOGIN_SALT,
+          addressSeed,
         },
         maxEpoch: session.maxEpoch,
         userSignature: ephemeralSignature,

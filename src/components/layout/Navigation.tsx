@@ -4,7 +4,7 @@ import React from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { clsx } from 'clsx';
-import { Scroll, Package, Box } from 'lucide-react';
+import { ArrowLeftRight, Landmark, Droplets, Settings, Swords } from 'lucide-react';
 
 interface NavItem {
   label: string;
@@ -14,19 +14,29 @@ interface NavItem {
 
 const navItems: NavItem[] = [
   {
+    label: 'Swap',
+    href: '/swap',
+    icon: <ArrowLeftRight size={20} />,
+  },
+  {
+    label: 'Lending',
+    href: '/lending',
+    icon: <Landmark size={20} />,
+  },
+  {
+    label: 'Faucet',
+    href: '/faucet',
+    icon: <Droplets size={20} />,
+  },
+  {
     label: 'Quests',
     href: '/quests',
-    icon: <Scroll size={20} />,
+    icon: <Swords size={20} />,
   },
   {
-    label: 'Inventory',
-    href: '/inventory',
-    icon: <Package size={20} />,
-  },
-  {
-    label: 'Treasure Chest',
-    href: '/treasure',
-    icon: <Box size={20} />,
+    label: 'Settings',
+    href: '/settings',
+    icon: <Settings size={20} />,
   },
 ];
 

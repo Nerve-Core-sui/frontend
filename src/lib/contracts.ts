@@ -16,15 +16,14 @@ export const SWAP_POOL = process.env.NEXT_PUBLIC_SWAP_POOL || '';
 // Clock object (standard Sui system object)
 export const CLOCK_OBJECT = '0x6';
 
-// Validate that all addresses are set
+// Validate that core addresses are set
 export function validateContractAddresses(): boolean {
   return !!(
     PACKAGE_ID &&
     MSUI_TREASURY &&
     MUSDC_TREASURY &&
     CLAIM_REGISTRY &&
-    LENDING_POOL &&
-    SWAP_POOL
+    LENDING_POOL
   );
 }
 
@@ -249,63 +248,6 @@ export function createRemoveLiquidityTransaction(lpReceiptId: string): Transacti
     arguments: [
       tx.object(SWAP_POOL),
       tx.object(lpReceiptId),
-    ],
-  });
-
-  return tx;
-}
-
-/**
- * Multi-step transaction example: Leverage quest
- * 1. Deposit MSUI
- * 2. Borrow MUSDC
- * 3. Swap MUSDC to MSUI
- * 4. Deposit again
- */
-export function createLeverageQuestTransaction(
-  initialMsuiCoinId: string,
-  borrowAmount: bigint,
-  minSwapOut: bigint
-): Transaction {
-  const tx = new Transaction();
-
-  // Step 1: Deposit MSUI
-  const [receipt] = tx.moveCall({
-    target: `${PACKAGE_ID}::lending::deposit`,
-    arguments: [
-      tx.object(LENDING_POOL),
-      tx.object(initialMsuiCoinId),
-      tx.object(CLOCK_OBJECT),
-    ],
-  });
-
-  // Step 2: Borrow MUSDC
-  const [borrowedMusdc] = tx.moveCall({
-    target: `${PACKAGE_ID}::lending::borrow`,
-    arguments: [
-      tx.object(LENDING_POOL),
-      receipt,
-      tx.pure.u64(borrowAmount),
-    ],
-  });
-
-  // Step 3: Swap MUSDC to MSUI
-  const [swappedMsui] = tx.moveCall({
-    target: `${PACKAGE_ID}::swap::swap_musdc_to_msui`,
-    arguments: [
-      tx.object(SWAP_POOL),
-      borrowedMusdc,
-      tx.pure.u64(minSwapOut),
-    ],
-  });
-
-  // Step 4: Deposit swapped MSUI
-  tx.moveCall({
-    target: `${PACKAGE_ID}::lending::deposit`,
-    arguments: [
-      tx.object(LENDING_POOL),
-      swappedMsui,
-      tx.object(CLOCK_OBJECT),
     ],
   });
 

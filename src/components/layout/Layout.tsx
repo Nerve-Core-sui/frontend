@@ -4,7 +4,6 @@ import React from 'react';
 import { AnimatePresence } from 'framer-motion';
 import { AppHeader } from './AppHeader';
 import { AppBottomNav } from './AppBottomNav';
-import { TransactionOverlay } from '@/components/transaction/TransactionOverlay';
 import { SplashScreen } from '@/components/splash';
 import { useSplashScreen } from '@/hooks/useSplashScreen';
 
@@ -43,8 +42,6 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
             <AppBottomNav />
           </div>
 
-          {/* Transaction Overlay (inside phone-device so it's contained on desktop) */}
-          <TransactionOverlay />
         </div>
       </div>
     </>

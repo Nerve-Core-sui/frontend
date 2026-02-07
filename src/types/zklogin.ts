@@ -16,6 +16,7 @@ export interface ZkProof {
     indexMod4: number;
   };
   headerBase64: string;
+  addressSeed?: string;
 }
 
 export interface JWTPayload {

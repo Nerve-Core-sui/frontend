@@ -2,7 +2,6 @@ import type { Metadata, Viewport } from 'next';
 import { Press_Start_2P, VT323 } from 'next/font/google';
 import './globals.css';
 import { AuthProvider } from '@/contexts/AuthContext';
-import { BattleProvider } from '@/contexts/BattleContext';
 import { Layout } from '@/components/layout';
 
 const pressStart2P = Press_Start_2P({
@@ -53,9 +52,7 @@ export default function RootLayout({
       </head>
       <body className={`${pressStart2P.variable} ${vt323.variable} font-sans`}>
         <AuthProvider>
-          <BattleProvider>
-            <Layout>{children}</Layout>
-          </BattleProvider>
+          <Layout>{children}</Layout>
         </AuthProvider>
       </body>
     </html>

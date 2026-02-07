@@ -8,8 +8,8 @@ import { motion } from 'framer-motion';
 const navItems = [
   { href: '/', icon: '⌂', label: 'Home' },
   { href: '/quests', icon: '⚔', label: 'Quests' },
-  { href: '/wallet', icon: '◈', label: 'Wallet' },
-  { href: '/settings', icon: '✦', label: 'Settings' },
+  { href: '/wallet', icon: '◈', label: 'Inventory' },
+  { href: '/settings', icon: '⚙', label: 'Settings' },
 ];
 
 export const BottomNav: React.FC = () => {

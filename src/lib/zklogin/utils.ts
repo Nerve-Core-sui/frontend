@@ -4,7 +4,9 @@ import {
   generateNonce,
   generateRandomness,
   jwtToAddress,
+  genAddressSeed,
   getExtendedEphemeralPublicKey,
+  computeZkLoginAddressFromSeed,
 } from '@mysten/sui/zklogin';
 import { jwtDecode } from 'jwt-decode';
 import { JWTPayload, GoogleOAuthConfig } from '@/types/zklogin';
@@ -77,7 +79,25 @@ export function decodeJwt(jwt: string): JWTPayload {
  * Derive Sui address from JWT using real zkLogin address derivation
  */
 export function deriveZkLoginAddress(jwt: string, salt: string): string {
-  return jwtToAddress(jwt, BigInt(salt), false);
+  return jwtToAddress(jwt, BigInt(salt), true);
+}
+
+/**
+ * Compute the addressSeed for getZkLoginSignature
+ * This is NOT the raw salt — it's a hash of (salt, 'sub', jwt.sub, jwt.aud)
+ */
+export function computeAddressSeed(jwt: string, salt: string): string {
+  const decoded = decodeJwt(jwt);
+  const aud = Array.isArray(decoded.aud) ? decoded.aud[0] : decoded.aud;
+  return genAddressSeed(BigInt(salt), 'sub', decoded.sub, aud).toString();
+}
+
+/**
+ * Derive Sui address from addressSeed (returned by Enoki prover) + JWT issuer.
+ * This does NOT require the salt — the addressSeed already incorporates it.
+ */
+export function deriveAddressFromSeed(addressSeed: string, iss: string): string {
+  return computeZkLoginAddressFromSeed(BigInt(addressSeed), iss, false);
 }
 
 /**
