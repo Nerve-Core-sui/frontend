@@ -26,7 +26,7 @@ export const TopBar: React.FC<TopBarProps> = ({ title, showLogo = true }) => {
                 textShadow: '2px 2px 0 rgba(0,0,0,0.5)',
               }}
             >
-              NERVECORE
+              NERVE
             </motion.h1>
           ) : title ? (
             <h1 className="font-pixel text-sm text-text-primary uppercase">{title}</h1>

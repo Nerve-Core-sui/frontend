@@ -1,6 +1,7 @@
 'use client';
 
 import React from 'react';
+import Image from 'next/image';
 import { useAuth } from '@/contexts/AuthContext';
 import { motion } from 'framer-motion';
 
@@ -16,17 +17,14 @@ export const AppHeader: React.FC = () => {
         animate={{ opacity: 1, x: 0 }}
         transition={{ duration: 0.3, ease: 'easeOut' }}
       >
-        {/* Pixel diamond icon */}
-        <div
-          className="w-7 h-7 flex items-center justify-center"
-          style={{
-            background: 'linear-gradient(135deg, #a3e635 0%, #84cc16 50%, #65a30d 100%)',
-            border: '2px solid #4d7c0f',
-            boxShadow: '2px 2px 0 0 #0d0a14',
-          }}
-        >
-          <span className="text-[10px] font-pixel text-background leading-none">N</span>
-        </div>
+        <Image
+          src="/logo.png"
+          alt="Nerve"
+          width={28}
+          height={28}
+          className="w-7 h-7"
+          style={{ imageRendering: 'pixelated' }}
+        />
         <h1
           className="font-pixel text-[13px] text-pixel-lime tracking-wider"
           style={{

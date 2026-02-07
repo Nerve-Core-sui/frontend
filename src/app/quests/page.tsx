@@ -2,7 +2,7 @@
 
 import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
-import { ArrowLeftRight, Landmark, Layers, ChevronRight, Zap, AlertCircle } from 'lucide-react';
+import { ArrowLeftRight, Landmark, Layers, ChevronRight, Zap, AlertCircle, Lock } from 'lucide-react';
 import { Card } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
 import { AuthGuard } from '@/components/auth';
@@ -20,6 +20,7 @@ interface QuestType {
   steps: string[];
   actionLabel: string;
   href: string;
+  locked?: boolean;
 }
 
 export default function QuestsPage() {
@@ -76,8 +77,9 @@ export default function QuestsPage() {
         'Swap borrowed MUSDC back to MSUI',
         'Deposit the new MSUI for leveraged exposure',
       ],
-      actionLabel: 'Start Leverage',
+      actionLabel: 'Coming Soon',
       href: '/lending',
+      locked: true,
     },
   ];
 
@@ -144,7 +146,7 @@ export default function QuestsPage() {
               Quest Board
             </p>
             <p className="text-2xl font-bold text-text-primary">
-              3 Quests Available
+              2 Quests Available
             </p>
             <p className="text-sm text-text-muted mt-1">
               Each quest teaches a different DeFi strategy
@@ -154,12 +156,12 @@ export default function QuestsPage() {
               {questTypes.map((q) => (
                 <div
                   key={q.id}
-                  className="flex-1 flex items-center justify-center gap-2 p-2 border-2 border-border bg-surface-deep"
+                  className={`flex-1 flex items-center justify-center gap-2 p-2 border-2 border-border bg-surface-deep ${q.locked ? 'opacity-40' : ''}`}
                 >
-                  <div className="w-6 h-6 flex items-center justify-center" style={{ color: q.color }}>
+                  <div className="w-6 h-6 flex items-center justify-center" style={{ color: q.locked ? '#666' : q.color }}>
                     {q.id === 'swap' && <ArrowLeftRight size={16} />}
                     {q.id === 'yield' && <Landmark size={16} />}
-                    {q.id === 'leverage' && <Layers size={16} />}
+                    {q.id === 'leverage' && (q.locked ? <Lock size={16} /> : <Layers size={16} />)}
                   </div>
                   <span className="font-pixel text-[8px] text-text-muted uppercase">{q.id}</span>
                 </div>
@@ -200,7 +202,7 @@ export default function QuestsPage() {
               </div>
 
               {/* Quest Body */}
-              <div className="p-4 space-y-4">
+              <div className={`p-4 space-y-4 ${quest.locked ? 'opacity-50' : ''}`}>
                 <p className="text-sm text-text-secondary">
                   {quest.description}
                 </p>
@@ -228,14 +230,20 @@ export default function QuestsPage() {
                   variant="primary"
                   size="lg"
                   className="w-full"
-                  disabled={!hasProof || (user?.balance ?? 0) < 0.01}
-                  onClick={() => handleStartQuest(quest.id, quest.href)}
-                  icon={<ChevronRight size={16} />}
+                  disabled={quest.locked || !hasProof || (user?.balance ?? 0) < 0.01}
+                  onClick={() => !quest.locked && handleStartQuest(quest.id, quest.href)}
+                  icon={quest.locked ? <Lock size={16} /> : <ChevronRight size={16} />}
                 >
                   {quest.actionLabel}
                 </Button>
 
-                {(user?.balance ?? 0) < 0.01 && hasProof && (
+                {quest.locked && (
+                  <p className="text-xs text-text-muted text-center">
+                    This quest is not yet available
+                  </p>
+                )}
+
+                {!quest.locked && (user?.balance ?? 0) < 0.01 && hasProof && (
                   <p className="text-xs text-warning text-center">
                     Get SUI first from the Faucet to pay gas fees
                   </p>

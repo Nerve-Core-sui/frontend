@@ -19,13 +19,13 @@ const vt323 = VT323({
 });
 
 export const metadata: Metadata = {
-  title: 'NerveCore - DeFi Made Simple',
+  title: 'Nerve - DeFi Made Simple',
   description: 'Execute DeFi transactions with ease on Sui Network',
   manifest: '/manifest.json',
   appleWebApp: {
     capable: true,
     statusBarStyle: 'black-translucent',
-    title: 'NerveCore',
+    title: 'Nerve',
   },
 };
 

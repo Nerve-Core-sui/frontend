@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { motion } from 'framer-motion';
-import { AlertCircle, Check, ExternalLink, Landmark, ArrowDownToLine, ArrowUpFromLine } from 'lucide-react';
+import { AlertCircle, Check, ExternalLink, Landmark, ArrowDownToLine, ArrowUpFromLine, RefreshCw } from 'lucide-react';
 import { Card } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
 import { AuthGuard } from '@/components/auth';
@@ -49,6 +49,7 @@ export default function LendingPage() {
   const [txDigest, setTxDigest] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [selectedPosition, setSelectedPosition] = useState<string | null>(null);
+  const [isRefreshing, setIsRefreshing] = useState(false);
 
   // Fetch pool stats
   const fetchPoolStats = useCallback(async () => {
@@ -65,11 +66,20 @@ export default function LendingPage() {
       const msuiRes = fields.msui_reserve;
       const musdcRes = fields.musdc_reserve;
 
+      // Balance<T> can be serialized as plain string or as object with fields.value
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const parseBal = (v: any): string => {
+        if (typeof v === 'string' || typeof v === 'number') return String(v);
+        if (v?.fields?.value !== undefined) return String(v.fields.value);
+        if (v?.value !== undefined) return String(v.value);
+        return '0';
+      };
+
       setPoolStats({
         totalDeposits: String(fields.total_deposits ?? '0'),
         totalBorrows: String(fields.total_borrows ?? '0'),
-        msuiReserve: String(msuiRes?.fields?.value ?? msuiRes?.value ?? '0'),
-        musdcReserve: String(musdcRes?.fields?.value ?? musdcRes?.value ?? '0'),
+        msuiReserve: parseBal(msuiRes),
+        musdcReserve: parseBal(musdcRes),
       });
     } catch {
       // Pool might not exist
@@ -140,8 +150,31 @@ export default function LendingPage() {
     fetchPositions();
   }, [fetchPoolStats, fetchBalances, fetchPositions]);
 
+  // Auto-refresh balances periodically
+  useEffect(() => {
+    const interval = setInterval(() => {
+      fetchBalances();
+      fetchPositions();
+      fetchPoolStats();
+    }, 10000);
+    return () => clearInterval(interval);
+  }, [fetchBalances, fetchPositions, fetchPoolStats]);
+
   const refreshAll = async () => {
+    setIsRefreshing(true);
+    // Wait for chain finalization, then refresh with retries
+    await new Promise(r => setTimeout(r, 2000));
     await Promise.all([fetchPoolStats(), fetchBalances(), fetchPositions(), refreshBalance()]);
+    // Second refresh after a short delay to catch any propagation delays
+    await new Promise(r => setTimeout(r, 1500));
+    await Promise.all([fetchPoolStats(), fetchBalances(), fetchPositions()]);
+    setIsRefreshing(false);
+  };
+
+  const handleManualRefresh = async () => {
+    setIsRefreshing(true);
+    await Promise.all([fetchPoolStats(), fetchBalances(), fetchPositions(), refreshBalance()]);
+    setIsRefreshing(false);
   };
 
   // Deposit MSUI
@@ -192,6 +225,25 @@ export default function LendingPage() {
     try {
       const borrowAmount = parseTokenAmount(amount);
 
+      // Client-side validation
+      const pos = positions.find(p => p.receiptId === selectedPosition);
+      if (pos) {
+        const available = BigInt(pos.availableToBorrow);
+        if (borrowAmount > available) {
+          setError(`Max borrow for this position is ${formatTokenAmount(pos.availableToBorrow)} MUSDC`);
+          return;
+        }
+      }
+
+      // Check pool liquidity
+      if (poolStats) {
+        const poolMusdc = BigInt(poolStats.musdcReserve);
+        if (borrowAmount > poolMusdc) {
+          setError(`Insufficient pool liquidity. Pool only has ${formatTokenAmount(poolStats.musdcReserve)} MUSDC available.`);
+          return;
+        }
+      }
+
       const tx = new Transaction();
       tx.moveCall({
         target: `${PACKAGE_ID}::lending::borrow`,
@@ -208,10 +260,26 @@ export default function LendingPage() {
       await refreshAll();
     } catch (err) {
       const msg = err instanceof Error ? err.message : 'Borrow failed';
-      if (msg.includes('MoveAbort') && msg.includes('1')) {
-        setError('Insufficient collateral. Max borrow is 80% of deposit.');
-      } else if (msg.includes('4')) {
-        setError('Insufficient pool liquidity for this borrow amount.');
+      if (msg.includes('MoveAbort')) {
+        // Extract the error code number from the MoveAbort message
+        const codeMatch = msg.match(/,\s*(\d+)\)?/);
+        const code = codeMatch ? parseInt(codeMatch[1]) : -1;
+        switch (code) {
+          case 1:
+            setError('Insufficient collateral. Max borrow is 80% of your deposit value.');
+            break;
+          case 2:
+            setError('You can only borrow against your own position.');
+            break;
+          case 4:
+            setError('Insufficient pool MUSDC liquidity. The lending pool needs MUSDC reserves. Try swapping some tokens first or wait for others to repay.');
+            break;
+          case 6:
+            setError('Amount must be greater than zero.');
+            break;
+          default:
+            setError(msg);
+        }
       } else {
         setError(msg);
       }
@@ -622,7 +690,16 @@ export default function LendingPage() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.2 }}
         >
-          <h3 className="section-header px-1">Your Balances</h3>
+          <div className="flex items-center justify-between px-1">
+            <h3 className="section-header">Your Balances</h3>
+            <button
+              onClick={handleManualRefresh}
+              disabled={isRefreshing}
+              className="text-text-muted hover:text-accent transition-colors disabled:opacity-50"
+            >
+              <RefreshCw size={14} className={isRefreshing ? 'animate-spin' : ''} />
+            </button>
+          </div>
           <Card className="p-4 space-y-2">
             <div className="flex justify-between text-sm">
               <span className="text-text-muted">💧 MSUI</span>

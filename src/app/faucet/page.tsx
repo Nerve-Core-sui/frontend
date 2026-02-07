@@ -47,7 +47,7 @@ export default function FaucetPage() {
     setTimeout(() => setCopied(false), 3000);
 
     // Open faucet in new tab
-    window.open(SUI_FAUCET_URL, '_blank', 'noopener,noreferrer');
+    window.open(SUI_FAUCET_URL + "?address=" + user.address, '_blank', 'noopener,noreferrer');
 
     // Refresh balance after a delay (user will come back after getting SUI)
     setTimeout(() => refreshBalance(), 10000);

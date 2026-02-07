@@ -65,9 +65,18 @@ export default function SwapPage() {
       const msuiRes = fields.msui_reserve;
       const musdcRes = fields.musdc_reserve;
 
+      // Balance<T> can be serialized as plain string or as object with fields.value
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const parseBal = (v: any): bigint => {
+        if (typeof v === 'string' || typeof v === 'number') return BigInt(String(v));
+        if (v?.fields?.value !== undefined) return BigInt(String(v.fields.value));
+        if (v?.value !== undefined) return BigInt(String(v.value));
+        return BigInt(0);
+      };
+
       setReserves({
-        msuiReserve: BigInt(String(msuiRes?.fields?.value ?? msuiRes?.value ?? '0')),
-        musdcReserve: BigInt(String(musdcRes?.fields?.value ?? musdcRes?.value ?? '0')),
+        msuiReserve: parseBal(msuiRes),
+        musdcReserve: parseBal(musdcRes),
       });
       setPoolExists(true);
     } catch {
@@ -101,6 +110,15 @@ export default function SwapPage() {
     fetchPoolReserves();
     fetchBalances();
   }, [fetchPoolReserves, fetchBalances]);
+
+  // Auto-refresh balances and reserves periodically
+  useEffect(() => {
+    const interval = setInterval(() => {
+      fetchBalances();
+      fetchPoolReserves();
+    }, 10000);
+    return () => clearInterval(interval);
+  }, [fetchBalances, fetchPoolReserves]);
 
   // Calculate estimated output using constant product formula
   useEffect(() => {
